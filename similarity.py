@@ -33,3 +33,13 @@ class Similarity:
 
             print("Embeddings shapes:", [i.shape for i in self.embeddings][:2])
             print("Sample embedding:", [i[0][:5] for i in self.embeddings][:2])  # First 5 values of the first embedding
+
+      def compute_similarity(self, similarity_function):
+
+            self.similarities = list(map(
+                  similarity_function,
+                  zip(self.embeddings, self.embeddings[1:])
+            ))
+
+            print("Similarities shapes:", [i.shape for i in self.similarities][:2])
+            print("Sample similarity:", [i[0] for i in self.similarities][:2])

@@ -1,5 +1,6 @@
 import json
 from similarity import Similarity
+from torch.nn.functional import cosine_similarity
 
 
 with open("datasetdetails.jsonl", "r", encoding="utf-8") as file:
@@ -14,3 +15,4 @@ for entry in data:
 
 similarity = Similarity(text, text[:-1])
 similarity.generate_embeddings()
+similarity.compute_similarity(similarity_function=lambda x: cosine_similarity(x[0], x[1], dim=1))
