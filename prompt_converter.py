@@ -1,7 +1,7 @@
 from transformers import AutoTokenizer, AutoModel
 import torch
 
-class Similarity:
+class PromptConverter:
 
       def __init__(self, *args):
             self.inputs = [*args]
@@ -17,7 +17,7 @@ class Similarity:
                   self.inputs
             ))
       
-      def generate_embeddings(self):
+      def generate_embeddings(self) -> str:
             self.tokenize()
             # Generate embeddings
             with torch.no_grad():  # No gradient calculation needed for inference
@@ -31,15 +31,13 @@ class Similarity:
                   self.outputs
             ))
 
-            print("Embeddings shapes:", [i.shape for i in self.embeddings][:2])
-            print("Sample embedding:", [i[0][:5] for i in self.embeddings][:2])  # First 5 values of the first embedding
+            return f"Embeddings shapes: {[i.shape for i in self.embeddings][:2]} Sample embedding: {[i[0][:5] for i in self.embeddings][:2]}"
 
-      def compute_similarity(self, similarity_function):
+      def compute_similarity(self, similarity_function) -> str:
 
             self.similarities = list(map(
                   similarity_function,
                   zip(self.embeddings, self.embeddings[1:])
             ))
 
-            print("Similarities shapes:", [i.shape for i in self.similarities][:2])
-            print("Sample similarity:", [i[0] for i in self.similarities][:2])
+            return f"Similarities shapes: {[i.shape for i in self.similarities][:2]} Sample similarity: {[i[0] for i in self.similarities][:2]}"
