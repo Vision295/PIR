@@ -10,7 +10,7 @@
       ]
 
 """
-csv_writer = list[dict[str, list[str | float]]]
+csv_writer = list[dict[str, list[str]] | dict[str, list[float]]]
 
 
 def remove_duplicates(inputFile:str = "datasetdetails.jsonl", outputFile:str= "datasetdetails_cleaned.jsonl"):
@@ -26,3 +26,4 @@ def remove_duplicates(inputFile:str = "datasetdetails.jsonl", outputFile:str= "d
                   if line not in unique_lines:
                         unique_lines.add(line)
                         outfile.write(line + "\n")
+

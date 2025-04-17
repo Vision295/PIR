@@ -14,14 +14,11 @@ class CsvManager():
             Args:
                   file_path (str): The path to the CSV file.
             """
-            self.file_paths = list(file_paths)
-            self.datas = [pd.read_csv(file_path) for file_path in self.file_paths]
+            if file_paths:
+                  self.file_paths = list(file_paths)
+                  self.datas = [pd.read_csv(file_path) for file_path in self.file_paths]
       
       def write_similarity_dict_to_csv(self, similarityDict: csv_writer, fileName: str):
-            if type(similarityDict) != csv_writer:
-                  raise TypeError(f"Wrong type : {type(similarityDict)} instead of : {csv_writer}")
-                  return
-            
             rows = []
             for entry in similarityDict[1:]:
                   for key, values in entry.items():
