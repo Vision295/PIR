@@ -1,4 +1,20 @@
+
+"""
+      csv_writer : 
+      [
+            {"descriptions": list of all the elements of datasetDescriptions},
+            {datasetDescriptions[0]: [similarity between datasetDescriptions[0] and datasetDescriptions[0], ... up to datasetDescriptions[size]]},
+            {datasetDescriptions[1]: [similarity between datasetDescriptions[1] and datasetDescriptions[0], ... up to datasetDescriptions[size]]},
+            ...
+            {datasetDescriptions[size]: [similarity between datasetDescriptions[n] and datasetDescriptions[0], ... up to datasetDescriptions[size]]}
+      ]
+
+"""
+csv_writer = list[dict[str, list[str | float]]]
+
+
 def remove_duplicates(inputFile:str = "datasetdetails.jsonl", outputFile:str= "datasetdetails_cleaned.jsonl"):
+
       # Use a set to track unique lines
       unique_lines = set()
 

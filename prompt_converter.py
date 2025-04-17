@@ -33,10 +33,10 @@ class PromptConverter:
 
             return f"Embeddings shapes: {[i.shape for i in self.embeddings][:2]} Sample embedding: {[i[0][:5] for i in self.embeddings][:2]}"
 
-      def compute_similarity(self, similarity_function) -> str:
+      def compute_similarity(self, similarityFunction) -> str:
 
             self.similarities = list(map(
-                  similarity_function,
+                  similarityFunction,
                   zip(self.embeddings, self.embeddings[1:])
             ))
 
