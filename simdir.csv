@@ -1,0 +1,4 @@
+description,text-classification,text-classification text2text-generation text-generation,time-series-forecasting
+text-classification,0.9999998807907104,0.5953330397605896,0.23981118202209473
+text-classification text2text-generation text-generation,0.5953330397605896,1.0,0.13236545026302338
+time-series-forecasting,0.23981118202209473,0.13236545026302338,0.9999998807907104
