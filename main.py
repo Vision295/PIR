@@ -67,8 +67,8 @@ cosine = lambda x: cosine_similarity(x[0], x[1], dim=1)
 similarityDict = compute_similarity_over_dataset(
       datasetName="datasetdetails_cleaned.jsonl",
       descriptionType="task_categories", 
-      outputFileName="distcos.csv",
-      similarityFunction=lambda x : euclidian(x, 0.5)
+      outputFileName="disteuclidian3.csv",
+      similarityFunction=lambda x : euclidian(x, 0.333)
 )
 
 print(similarityDict)
