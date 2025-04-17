@@ -20,7 +20,7 @@ def get_dataset_description(datasetName:dict, descriptionType:str) -> list[list[
       for index, entry in enumerate(data):
             if entry[descriptionType]:
                   datasetDescriptions.append([" ".join(entry[descriptionType])])
-      return datasetDescriptions[:2]
+      return datasetDescriptions
 
 def compute_similarity_over_dataset(datasetName:str, descriptionType:str, outputFileName:str, similarityFunction) -> csv_writer:
       """

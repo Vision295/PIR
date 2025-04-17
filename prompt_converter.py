@@ -5,7 +5,6 @@ class PromptConverter:
 
       def __init__(self, *args):
             self.inputs = [*args]
-            print(self.inputs)
 
             self.model_name = "sentence-transformers/all-MiniLM-L6-v2"
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
