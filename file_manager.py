@@ -1,8 +1,9 @@
 import pandas as pd
+import os
 from utils import *
 
 
-class CsvManager():
+class FileManager():
       """
       A class to read a CSV file and convert it into a DataFrame.
       """
@@ -30,4 +31,6 @@ class CsvManager():
             df.columns = [*desc.keys()] + list(*desc.values())
 
             # Write the DataFrame to a CSV file
-            df.to_csv(fileName, index=False, encoding="utf-8")
+            os.makedirs("csv", exist_ok=True)
+            output_path = os.path.join("csv", fileName)
+            df.to_csv(output_path, index=False)
