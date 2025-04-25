@@ -1,8 +1,9 @@
 import json
-from prompt_converter import PromptConverter
-from utils import *
-from file_manager import FileManager
 
+from regex import D
+from prompt_converter import PromptConverter
+from utils import cosine_sim, euclidian, csv_writer
+from file_manager import FileManager
 
 
 def get_dataset_description(datasetName:str, descriptionType:str) -> list[list[str]]:
@@ -46,6 +47,7 @@ def compute_similarity_over_dataset(dataset1:str, dataset2:str, outputFileName:s
       similarityDict = [{v[0]: [0 for _ in range(size1)]} if i != 0 else {"description": [j[0] for j in dataset1]} for i, v in enumerate([" "] + dataset2)]
       print(similarityDict)
       for i, v in enumerate([0] + dataset2):
+            print("step :", i, "out of :", len(dataset2), "steps")
             for j, w in enumerate(dataset1):
                   # i == 0 is the description in w, w = {"description" : ["desc_1", "desc_2", ...]}
                   if i != 0:
@@ -64,7 +66,7 @@ def compute_similarity_over_dataset(dataset1:str, dataset2:str, outputFileName:s
 def compute_all_distances():
       datasets = [
             get_dataset_description("datasetdetails_cleaned.jsonl", "task_categories"),
-            get_dataset_description("datasetdetails_cleaned.jsonl", "datasetcard")
+            get_dataset_description("datasetdetails_cleaned.jsonl", "datasetcard")[:1000]
       ]
 
       similarityFunctions = [
@@ -73,26 +75,35 @@ def compute_all_distances():
             lambda x: euclidian(x, 1/3)
       ]
 
-      promptList = [get_prompt_description("prompts.json")]
+      prompt = get_prompt_description("prompts.json")
 
-      for i, dataset in enumerate(promptList + datasets):
+      """
+      compute_similarity_over_dataset(
+            dataset1=datasets[0],
+            dataset2=datasets[0],
+            outputFileName="testing.csv",
+            similarityFunction=similarityFunctions[0]
+      )
+      """
+
+      for i, dataset in enumerate(datasets):
             for j, similarityFunction in enumerate(similarityFunctions):
-                  for k, prompts in enumerate(promptList + datasets):
-                        similarityDict = compute_similarity_over_dataset(
-                              dataset1=dataset,
-                              dataset2=prompts,
-                              outputFileName=f"dataset{i}-similarityFunc{j}-prompt{k}",
-                              similarityFunction=similarityFunction
-                        )
-                        print(f"printed in : dataset{i}-similarityFunc{j}-prompt{k}")
+                  print(f"STEP {j*i+j} out of {len(datasets)*len(similarityFunctions)}, working on dataset {i}, similarityFunction {j}")
+                  compute_similarity_over_dataset(
+                        dataset1=dataset,
+                        dataset2=prompt,
+                        outputFileName=f"dataset{i}-similarityFunc{j}.csv",
+                        similarityFunction=similarityFunction
+                  )
+                  print(f"printed in : dataset{i}-similarityFunc{j}.csv")
 
-
-
+"""
 similarityDict = compute_similarity_over_dataset(
       dataset1=get_dataset_description("datasetdetails_cleaned.jsonl", "task_categories"),
       dataset2=get_prompt_description("prompts.json"),
-      outputFileName="disteuclidian4prompt.csv",
+      outputFileName="disteuclidian3prompt.csv",
       similarityFunction=lambda x : euclidian(x, 1/3)
 )
-
 print(similarityDict)
+"""
+compute_all_distances()

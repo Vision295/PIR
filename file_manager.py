@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from utils import *
+from utils import csv_writer
 
 
 class FileManager():

@@ -40,4 +40,7 @@ def euclidian(x:int, powDist:float=0.5):
             res += fabs(z[i] - y[i]) ** (1/powDist)
       return torch.tensor([fabs(res) ** powDist])
 
-cosine_sim = lambda x: cosine_similarity(x[0], x[1], dim=1)
+def cosine_sim(x):
+      return cosine_similarity(x[0], x[1], dim=1)
+
+remove_duplicates("datasetdetails.jsonl")
