@@ -1,8 +1,8 @@
 import json
+from torch.nn.functional import cosine_similarity, pairwise_distance 
 
-from regex import D
 from prompt_converter import PromptConverter
-from utils import cosine_sim, euclidian, csv_writer
+from utils import csv_writer
 from file_manager import FileManager
 
 
@@ -45,7 +45,6 @@ def compute_similarity_over_dataset(dataset1:str, dataset2:str, outputFileName:s
       size1 = len(dataset1)
       # Initialize the similarity dictionary
       similarityDict = [{v[0]: [0 for _ in range(size1)]} if i != 0 else {"description": [j[0] for j in dataset1]} for i, v in enumerate([" "] + dataset2)]
-      print(similarityDict)
       for i, v in enumerate([0] + dataset2):
             print("step :", i, "out of :", len(dataset2), "steps")
             for j, w in enumerate(dataset1):
@@ -66,13 +65,12 @@ def compute_similarity_over_dataset(dataset1:str, dataset2:str, outputFileName:s
 def compute_all_distances():
       datasets = [
             get_dataset_description("datasetdetails_cleaned.jsonl", "task_categories"),
-            get_dataset_description("datasetdetails_cleaned.jsonl", "datasetcard")[:1000]
       ]
 
       similarityFunctions = [
-            cosine_sim,
-            lambda x: euclidian(x, 0.5),
-            lambda x: euclidian(x, 1/3)
+            lambda x: pairwise_distance(x[0], x[1], p=10),
+            lambda x: pairwise_distance(x[0], x[1], p=2),
+            lambda x: cosine_similarity(x[0], x[1], dim=1)
       ]
 
       prompt = get_prompt_description("prompts.json")
@@ -93,7 +91,7 @@ def compute_all_distances():
                         dataset1=dataset,
                         dataset2=prompt,
                         outputFileName=f"dataset{i}-similarityFunc{j}.csv",
-                        similarityFunction=similarityFunction
+                        similarityFunction=lambda x: similarityFunction(x)
                   )
                   print(f"printed in : dataset{i}-similarityFunc{j}.csv")
 

@@ -1,8 +1,3 @@
-import torch
-from math import fabs
-from torch.nn.functional import cosine_similarity
-
-
 """
       csv_writer : 
       [
@@ -31,16 +26,5 @@ def remove_duplicates(inputFile:str = "datasetdetails.jsonl", outputFile:str= "d
                         unique_lines.add(line)
                         outfile.write(line + "\n")
 
-
-def euclidian(x:int, powDist:float=0.5):
-      res = 0
-      y = x[0].tolist()[0]
-      z = x[1].tolist()[0]
-      for i in range(len(y)):
-            res += fabs(z[i] - y[i]) ** (1/powDist)
-      return torch.tensor([fabs(res) ** powDist])
-
-def cosine_sim(x):
-      return cosine_similarity(x[0], x[1], dim=1)
 
 remove_duplicates("datasetdetails.jsonl")
