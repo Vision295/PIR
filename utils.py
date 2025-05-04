@@ -1,3 +1,6 @@
+from torch.nn.functional import cosine_similarity, pairwise_distance
+from torch import Tensor
+
 """
       csv_writer : 
       [
@@ -27,4 +30,21 @@ def remove_duplicates(inputFile:str = "datasetdetails.jsonl", outputFile:str= "d
                         outfile.write(line + "\n")
 
 
-remove_duplicates("datasetdetails.jsonl")
+#remove_duplicates("datasetdetails.jsonl")
+
+
+print(
+      cosine_similarity(
+            Tensor([1.0, 2.0]),
+            Tensor([2.0, 3.0]),
+            dim=0
+      )
+)
+
+print(
+      pairwise_distance(
+            Tensor([1.0, 2.0]),
+            Tensor([2.0, 3.0]),
+            p=2
+      )     
+)
