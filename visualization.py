@@ -22,7 +22,7 @@ class Visualization:
 
       def top_values(self, column_name, n=5):
             if self.df is not None:
-                  top = self.df[column_name].nlargest(n)
+                  top = self.df[column_name].nsmallest(n)
                   print(top)
             else:
                   print("Data not loaded yet.")
