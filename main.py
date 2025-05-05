@@ -4,6 +4,7 @@ from torch.nn.functional import cosine_similarity, pairwise_distance
 from prompt_converter import PromptConverter
 from utils import csv_writer
 from file_manager import FileManager
+from math import fabs
 
 
 def get_dataset_description(datasetName:str, descriptionType:str) -> list[list[str]]:
@@ -55,7 +56,7 @@ def compute_similarity_over_dataset(dataset1:str, dataset2:str, outputFileName:s
                         promptConverter.compute_similarity(similarityFunction)
                         # stores the similarity value in : {"desc_i": [X, X, X, ..., Y, X, X, ...]} 
                         # changes Y where Y is the jth element and desc_i is the ith description
-                        similarityDict[i][v[0]][j] = promptConverter.similarities[0].item()
+                        similarityDict[i][v[0]][j] = fabs(promptConverter.similarities[0].item())
                         
       print(similarityDict)
       csvManager.write_similarity_dict_to_csv(similarityDict, outputFileName)
@@ -68,9 +69,9 @@ def compute_all_distances():
       ]
 
       similarityFunctions = [
+            lambda x: cosine_similarity(x[0], x[1], dim=0),
             lambda x: pairwise_distance(x[0], x[1], p=10),
             lambda x: pairwise_distance(x[0], x[1], p=2),
-            lambda x: cosine_similarity(x[0], x[1], dim=0)
       ]
 
       prompt = get_prompt_description("prompts.json")

@@ -22,7 +22,7 @@ class Visualization:
 
       def top_values(self, column_name, n=5):
             if self.df is not None:
-                  top = self.df[column_name].nsmallest(n)
+                  top = self.df.nsmallest(n, 'text-classification')
                   print(top)
             else:
                   print("Data not loaded yet.")
