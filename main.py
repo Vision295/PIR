@@ -70,7 +70,7 @@ def compute_all_distances():
       similarityFunctions = [
             lambda x: pairwise_distance(x[0], x[1], p=10),
             lambda x: pairwise_distance(x[0], x[1], p=2),
-            lambda x: cosine_similarity(x[0], x[1], dim=1)
+            lambda x: cosine_similarity(x[0], x[1], dim=0)
       ]
 
       prompt = get_prompt_description("prompts.json")

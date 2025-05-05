@@ -36,7 +36,7 @@ class PromptConverter:
 
             self.similarities = list(map(
                   similarityFunction,
-                  zip(self.embeddings, self.embeddings[1:])
+                  zip(*self.embeddings)
             ))
 
-            return f"Similarities shapes: {[i.shape for i in self.similarities][:2]} Sample similarity: {[i[0] for i in self.similarities][:2]}"
+            #return f"Similarities shapes: {[i.shape for i in self.similarities][:2]} Sample similarity: {[i[0] for i in self.similarities][:2]}"
