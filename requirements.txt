@@ -2,3 +2,4 @@ pandas==2.2.3
 torch==2.7.0
 transformers==4.51.3
 matplotlib.pyplot
+seaborn==0.13.2
