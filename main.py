@@ -6,6 +6,7 @@ from utils import csv_writer
 from file_manager import FileManager
 from math import fabs
 
+### TODO : Jaccard Distance
 
 def get_dataset_description(datasetName:str, descriptionType:str) -> list[list[str]]:
       """
