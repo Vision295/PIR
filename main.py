@@ -1,4 +1,5 @@
 import json
+import torch
 from torch.nn.functional import cosine_similarity, pairwise_distance 
 
 from prompt_converter import PromptConverter
@@ -22,6 +23,18 @@ def jaccard_index(set1:set, set2:set) -> float:
             return intersection / union
       else:
             return 0.0
+
+def jaccard_index_for_embeddings(embedding1:torch.Tensor, embedding2:torch.Tensor, threshold:float=0.5) -> torch.Tensor:
+      """
+      On binarise les embeddings et on applique l'index de jaccard sur les embeddings binaires
+      """
+      binary1 = (embedding1 > threshold).float()
+      binary2 = (embedding2 > threshold).float()
+
+      intersection = torch.sum(binary1 * binary2)
+      union = torch.sum((binary1 + binary2) > 0)
+
+      return intersection / union if union > 0 else torch.tensor(0.0)
       
 def compute_jaccard_index_over_dataset(dataset1:list[list[str]], dataset2:list[list[str]]) -> csv_writer:
       """
@@ -36,12 +49,10 @@ def compute_jaccard_index_over_dataset(dataset1:list[list[str]], dataset2:list[l
             for j, w in enumerate(dataset1):
                   # i == 0 is the description in w, w = {"description" : ["desc_1", "desc_2", ...]}
                   if i != 0:
-                        v = list_to_set(v)
-                        w = list_to_set(w)
-                        similarityDict[i][v[0]][j] = jaccard_index(v, w)
+                        similarityDict[i][v[0]][j] = jaccard_index(list_to_set(v), list_to_set(w))
                         
       print(similarityDict)
-      csvManager.write_similarity_dict_to_csv(similarityDict, "jaccard.csv")
+      csvManager.write_similarity_dict_to_csv(similarityDict, "jaccard_without_embeddings.csv")
       return similarityDict
 
 def get_dataset_description(datasetName:str, descriptionType:str) -> list[list[str]]:
@@ -108,7 +119,8 @@ def compute_all_distances():
       similarityFunctions = [
             lambda x: pairwise_distance(x[0], x[1], p=0.5),
             lambda x: pairwise_distance(x[0], x[1], p=2),
-            lambda x: cosine_similarity(x[0], x[1], dim=0)
+            lambda x: cosine_similarity(x[0], x[1], dim=0),
+            lambda x: jaccard_index_for_embeddings(x[0], x[1])
       ]
 
       prompt = get_prompt_description("prompts.json")
