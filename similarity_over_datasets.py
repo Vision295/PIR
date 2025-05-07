@@ -1,4 +1,5 @@
 import json
+from pkgutil import get_data
 
 from prompt_converter import PromptConverter
 from utils import csv_writer, similarityFunctions
@@ -36,19 +37,21 @@ def get_prompt_description(promptName:str) -> list[list[str]] :
 def compute_similarity_over_dataset(dataset1:list[list[str]], dataset2:list[list[str]], outputFileName:str, similarityFunction, location:str="csv") -> csv_writer:
       """
       inputs : 
-      datasets1 and 2 : lists of list of strings, where each list is a dataset description
+      dataset1 and 2 : lists of list of strings, where each list is a dataset description
       [["desc1"], ["desc2"], ..., ["descN"]]
       similarityFunction : function to compute the similarity between two dataset descriptions
       lambda x : computation(x[0], x[1])
       
       returns : csv_writer
       """
+
+      ### TODO : seperate header from data 
       csvManager = FileManager()
 
       size1 = len(dataset1)
       # Initialize the similarity dictionary
-      similarityDict = [{v[0]: [0 for _ in range(size1)]} if i != 0 else {"description": [j[0] for j in dataset1]} for i, v in enumerate([" "] + dataset2)]
-      for i, v in enumerate([""] + dataset2):
+      similarityDict = [{v[0]: [0.0 for _ in range(size1)]} if i != 0 else {"description": [j[0] for j in dataset1]} for i, v in enumerate([""] + dataset2)]
+      for i, v in enumerate([[""]] + dataset2):
             print("step :", i, "out of :", len(dataset2), "steps")
             for j, w in enumerate(dataset1):
                   # i == 0 is the description in w, w = {"description" : ["desc_1", "desc_2", ...]}
@@ -58,44 +61,55 @@ def compute_similarity_over_dataset(dataset1:list[list[str]], dataset2:list[list
                         promptConverter.compute_similarity(similarityFunction)
                         # stores the similarity value in : {"desc_i": [X, X, X, ..., Y, X, X, ...]} 
                         # changes Y where Y is the jth element and desc_i is the ith description
-                        similarityDict[i][v[0]][j] = str(fabs(promptConverter.similarities[0].item())) 
+                        similarity:float = fabs(promptConverter.similarities[0].item())
+                        similarityDict[i][v[0]][j] = similarity # type: ignore
                         
       print(similarityDict)
       csvManager.write_similarity_dict_to_csv(similarityDict, outputFileName, location)
       return similarityDict
 
-datasetList = list[list[list[str]]]
+"""
+      datasetList = [["task_categorization", "task_classification"], [...]]
+      OR 
+      datasetList = [["one very long task"], ["another long task"], ...]
+"""
+datasetList = list[list[str]]
 def compute_all_distances(
-            datasets1:datasetList,
-            datasets2:datasetList,
-            simialirtyFunctions:list,
+            dataset1:datasetList,
+            dataset2:datasetList,
+            similarityFunctions:list,
             outputLocation:str
       ) -> None:
-      for i, dataset in enumerate(datasets1):
-            for j, similarityFunction in enumerate(similarityFunctions):
-                  for prompt in datasets2:
-                        print(f"STEP {j*i+j} out of {len(datasets1)*len(datasets2)*len(similarityFunctions)}, working on dataset {i}, similarityFunction {j}")
-                        compute_similarity_over_dataset(
-                              dataset1=dataset,
-                              dataset2=prompt,
-                              outputFileName=f"dataset{i}-similarityFunc{j}.csv",
-                              similarityFunction=lambda x: similarityFunction(x),
-                              location=outputLocation
-                        )
-                        print(f"printed in : dataset{i}-similarityFunc{j}.csv")
+      """loops through the list of similarity functions and computes the similarity between the datasets"""
+      for j, similarityFunction in enumerate(similarityFunctions):
+                  print(f"STEP {j} out of {len(similarityFunctions)}")
+                  compute_similarity_over_dataset(
+                        dataset1=dataset1,
+                        dataset2=dataset2,
+                        outputFileName=f"similarityFunc{j}.csv",
+                        similarityFunction=lambda x: similarityFunction(x),
+                        location=outputLocation
+                  )
+                  print(f"printed in : similarityFunc{j}.csv")
 
 
 print(get_dataset_description("datasetdetails_cleaned.jsonl", "task_categories"), get_prompt_description("prompts.json"))
 
 # compute_all_distances(
-#       [get_dataset_description("datasetdetails_cleaned.jsonl", "task_categories")],
-#       [get_prompt_description("prompts.json")],
+#       [get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories")],
+#       [get_prompt_description("data/sim_dataset-prompt/prompts.json")],
 #       similarityFunctions
 # )
 
+datasets1 = get_dataset_description("data/sim_tasks/4/task_embeddings.jsonl", "task") # + \ get_dataset_description of another one
+datasets2 = get_dataset_description("data/sim_tasks/4/task_embeddings.jsonl", "task")
+
 compute_all_distances(
-      [get_dataset_description("task_embeddings.jsonl", "task")],
-      [get_dataset_description("task_embeddings.jsonl", "task")],
+      datasets1,
+      datasets2,
       similarityFunctions,
-      outputLocation="sim_tasks"
+      outputLocation="data/sim_tasks/4/"
 )
+     
+     
+     
