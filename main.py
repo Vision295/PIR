@@ -6,7 +6,43 @@ from utils import csv_writer
 from file_manager import FileManager
 from math import fabs
 
-### TODO : Jaccard Distance
+def list_to_set(list1:list[list[str]]) -> set:
+      """
+      converti une liste de listes en un set
+      """
+      return set(item[0] for item in list1)
+
+def jaccard_index(set1:set, set2:set) -> float:
+      """
+      Jaccard index entre 2 sets : |A n B| / |A u B|
+      """
+      intersection = len(set1.intersection(set2))
+      union = len(set1.union(set2))
+      if union != 0:
+            return intersection / union
+      else:
+            return 0.0
+      
+def compute_jaccard_index_over_dataset(dataset1:list[list[str]], dataset2:list[list[str]]) -> csv_writer:
+      """
+      applique l'index de jaccard directement sur les datasets
+      """
+      csvManager = FileManager()
+      size1 = len(dataset1)
+      # Initialize the similarity dictionary
+      similarityDict = [{v[0]: [0 for _ in range(size1)]} if i != 0 else {"description": [j[0] for j in dataset1]} for i, v in enumerate([" "] + dataset2)]
+      for i, v in enumerate([0] + dataset2):
+            print("step :", i, "out of :", len(dataset2), "steps")
+            for j, w in enumerate(dataset1):
+                  # i == 0 is the description in w, w = {"description" : ["desc_1", "desc_2", ...]}
+                  if i != 0:
+                        v = list_to_set(v)
+                        w = list_to_set(w)
+                        similarityDict[i][v[0]][j] = jaccard_index(v, w)
+                        
+      print(similarityDict)
+      csvManager.write_similarity_dict_to_csv(similarityDict, "jaccard.csv")
+      return similarityDict
 
 def get_dataset_description(datasetName:str, descriptionType:str) -> list[list[str]]:
       """
@@ -87,6 +123,9 @@ def compute_all_distances():
       """
 
       for i, dataset in enumerate(datasets):
+            compute_jaccard_index_over_dataset(
+                  dataset1=dataset,
+                  dataset2=prompt)
             for j, similarityFunction in enumerate(similarityFunctions):
                   print(f"STEP {j*i+j} out of {len(datasets)*len(similarityFunctions)}, working on dataset {i}, similarityFunction {j}")
                   compute_similarity_over_dataset(
