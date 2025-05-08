@@ -19,7 +19,7 @@ class FileManager():
                   self.file_paths = list(file_paths)
                   self.datas = [pd.read_csv(file_path) for file_path in self.file_paths]
       
-      def write_similarity_dict_to_csv(self, similarityDict: csv_writer, fileName: str):
+      def write_similarity_dict_to_csv(self, similarityDict: csv_writer, fileName: str, location:str="csv"):
             rows = []
             for entry in similarityDict[1:]:
                   for key, values in entry.items():
@@ -30,7 +30,13 @@ class FileManager():
             desc = similarityDict[0]
             df.columns = [*desc.keys()] + list(*desc.values())
 
-            # Write the DataFrame to a CSV file
-            os.makedirs("csv", exist_ok=True)
-            output_path = os.path.join("csv", fileName)
+            # Check if location is a valid existing directory
+            if os.path.isdir(location):
+                  output_path = os.path.join(location, fileName)
+            elif os.path.isfile(location):
+                  output_path = location
+            else:
+                  print(f"Warning: '{location}' is not a valid directory. Saving file locally.")
+                  output_path = fileName  # Save in current working directory
+            # Save the DataFrame
             df.to_csv(output_path, index=False)

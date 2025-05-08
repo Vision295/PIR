@@ -14,6 +14,11 @@ from torch import Tensor
 """
 csv_writer = list[dict[str, list[str]] | dict[str, list[float]]]
 
+similarityFunctions = [
+      lambda x: pairwise_distance(x[0], x[1], p=0.5),
+      lambda x: pairwise_distance(x[0], x[1], p=2),
+      lambda x: cosine_similarity(x[0], x[1], dim=0)
+]
 
 def remove_duplicates(inputFile:str = "datasetdetails.jsonl", outputFile:str= "datasetdetails_cleaned.jsonl"):
 
