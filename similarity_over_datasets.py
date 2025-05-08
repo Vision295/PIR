@@ -114,9 +114,12 @@ def compute_all_distances(
             similarityFunctions:list,
             outputLocation:str
       ) -> None:
+
+      #jaccard index avec des chaines de caractères sur les datasets directement
       compute_jaccard_index_over_dataset(
             dataset1=dataset1,
             dataset2=dataset2)
+      
       """loops through the list of similarity functions and computes the similarity between the datasets"""
       for j, similarityFunction in enumerate(similarityFunctions):
                   print(f"STEP {j} out of {len(similarityFunctions)}")
