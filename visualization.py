@@ -28,7 +28,7 @@ class Visualization:
                   plt.title("Heatmap")
                   plt.tight_layout()
                   plt.savefig('heatmap.png')
-                  print(f"Heatmap saved to heatmap.png")
+                  print("Heatmap saved to heatmap.png")
             else:
                   print("Data not loaded yet.")
       
@@ -46,7 +46,7 @@ class Visualization:
                   plt.xlabel('Colonnes')
                   plt.tight_layout()
                   plt.savefig('barchart.png')
-                  print(f"Heatmap saved to barchart.png")
+                  print("Heatmap saved to barchart.png")
             else:
                   print("Données non chargées.")
 

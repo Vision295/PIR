@@ -1,5 +1,4 @@
 import json
-from pkgutil import get_data
 
 from prompt_converter import PromptConverter
 from utils import csv_writer, similarityFunctions
@@ -53,8 +52,10 @@ def get_dataset_description(datasetName:str, descriptionType:str) -> list[list[s
       datasetDescriptions = []
       for index, entry in enumerate(data):
             if entry[descriptionType]:
-                  if type(entry) is not str:
+                  if type(entry[descriptionType]) is not str:
                         datasetDescriptions.append([" ".join(entry[descriptionType])])
+                  else:
+                        datasetDescriptions.append([entry[descriptionType]])
       return datasetDescriptions
 
 def get_prompt_description(promptName:str) -> list[list[str]] :
@@ -116,9 +117,10 @@ def compute_all_distances(
       ) -> None:
 
       #jaccard index avec des chaines de caractères sur les datasets directement
-      compute_jaccard_index_over_dataset(
-            dataset1=dataset1,
-            dataset2=dataset2)
+      # compute_jaccard_index_over_dataset(
+      #       dataset1=dataset1,
+      #       dataset2=dataset2
+      # )
       
       """loops through the list of similarity functions and computes the similarity between the datasets"""
       for j, similarityFunction in enumerate(similarityFunctions):
@@ -131,9 +133,6 @@ def compute_all_distances(
                         location=outputLocation
                   )
                   print(f"printed in : similarityFunc{j}.csv")
-
-
-print(get_dataset_description("datasetdetails_cleaned.jsonl", "task_categories"), get_prompt_description("prompts.json"))
 
 # compute_all_distances(
 #       [get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories")],
