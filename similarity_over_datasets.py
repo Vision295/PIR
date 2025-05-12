@@ -140,15 +140,12 @@ def compute_all_distances(
 #       similarityFunctions
 # )
 
-datasets1 = get_dataset_description("data/sim_tasks/4/task_embeddings.jsonl", "task") # + \ get_dataset_description of another one
-datasets2 = get_dataset_description("data/sim_tasks/4/task_embeddings.jsonl", "task")
+datasets1 = get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories") # + \ get_dataset_description of another one
+datasets2 = get_prompt_description("data/sim_dataset-prompt/prompts.json")
 
 compute_all_distances(
       datasets1,
       datasets2,
       similarityFunctions,
-      outputLocation="data/sim_tasks/4/"
+      outputLocation="data/sim_dataset-prompt/"
 )
-     
-     
-     
