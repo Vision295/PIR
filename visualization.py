@@ -34,13 +34,19 @@ class Visualization:
                         print("Aucune colonne numérique à afficher.")
                         return
 
+                  if self.file_path == 'data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv':
+                        numeric_df = numeric_df.round(0).astype(int)
+
                   n_rows, n_cols = numeric_df.shape
                   cell_size = 1.0 
                   figsize_x = max(10, n_cols * cell_size)
                   figsize_y = max(10, n_rows * cell_size)
 
                   plt.figure(figsize=(figsize_x, figsize_y))
-                  sns.heatmap(numeric_df, annot=True, cmap='viridis', fmt=".2f", annot_kws={"size": 8})
+                  if self.file_path == 'data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv':
+                        sns.heatmap(numeric_df, annot=True, cmap='viridis', fmt="d", annot_kws={"size": 8})
+                  else:
+                        sns.heatmap(numeric_df, annot=True, cmap='viridis', fmt=".2f", annot_kws={"size": 8})
 
                   plt.title("Heatmap", fontsize=16)
                   plt.tight_layout()
@@ -124,7 +130,8 @@ class Visualization:
 vizualizer = [
       Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
       Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc1.csv', ascending=True),
-      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc2.csv', ascending=False)
+      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc2.csv', ascending=False),
+      Visualization('data/data/sim_dataset-prompt/jaccard_without_embeddings.csv', ascending=False)
 ]
 # for viz in vizualizer:
 #       viz.load_data()
