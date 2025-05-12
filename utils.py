@@ -16,10 +16,14 @@ import torch
 csv_writer = list[dict[str, list[str]] | dict[str, list[float]]]
 
 similarityFunctions = [
+      lambda x: jaccard_index_for_embeddings(x[0], x[1]),
       lambda x: pairwise_distance(x[0], x[1], p=0.5),
       lambda x: pairwise_distance(x[0], x[1], p=2),
       lambda x: cosine_similarity(x[0], x[1], dim=0),
-      lambda x: jaccard_index_for_embeddings(x[0], x[1])
+]
+
+repartitionThresholds = [
+      [30000, 32500, 35000, 37500],
 ]
 
 def jaccard_index_for_embeddings(embedding1:torch.Tensor, embedding2:torch.Tensor, threshold:float=0.5) -> torch.Tensor:
