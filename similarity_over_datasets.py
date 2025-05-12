@@ -1,12 +1,45 @@
 import json
-from pkgutil import get_data
 
 from prompt_converter import PromptConverter
 from utils import csv_writer, similarityFunctions
 from file_manager import FileManager
 from math import fabs
 
-### TODO : Jaccard Distance
+def list_to_set(list1:list[list[str]]) -> set:
+      """
+      converti une liste de listes en un set
+      """
+      return set(item[0] for item in list1)
+
+def jaccard_index(set1:set, set2:set) -> float:
+      """
+      Jaccard index entre 2 sets : |A n B| / |A u B|
+      """
+      intersection = len(set1.intersection(set2))
+      union = len(set1.union(set2))
+      if union != 0:
+            return intersection / union
+      else:
+            return 0.0
+      
+def compute_jaccard_index_over_dataset(dataset1:list[list[str]], dataset2:list[list[str]]) -> csv_writer:
+      """
+      applique l'index de jaccard directement sur les datasets
+      """
+      csvManager = FileManager()
+      size1 = len(dataset1)
+      # Initialize the similarity dictionary
+      similarityDict = [{v[0]: [0 for _ in range(size1)]} if i != 0 else {"description": [j[0] for j in dataset1]} for i, v in enumerate([" "] + dataset2)]
+      for i, v in enumerate([0] + dataset2):
+            print("step :", i, "out of :", len(dataset2), "steps")
+            for j, w in enumerate(dataset1):
+                  # i == 0 is the description in w, w = {"description" : ["desc_1", "desc_2", ...]}
+                  if i != 0:
+                        similarityDict[i][v[0]][j] = jaccard_index(list_to_set(v), list_to_set(w))
+                        
+      print(similarityDict)
+      csvManager.write_similarity_dict_to_csv(similarityDict, "jaccard_without_embeddings.csv")
+      return similarityDict
 
 def get_dataset_description(datasetName:str, descriptionType:str) -> list[list[str]]:
       """
@@ -19,8 +52,10 @@ def get_dataset_description(datasetName:str, descriptionType:str) -> list[list[s
       datasetDescriptions = []
       for index, entry in enumerate(data):
             if entry[descriptionType]:
-                  if type(entry) is not str:
+                  if type(entry[descriptionType]) is not str:
                         datasetDescriptions.append([" ".join(entry[descriptionType])])
+                  else:
+                        datasetDescriptions.append([entry[descriptionType]])
       return datasetDescriptions
 
 def get_prompt_description(promptName:str) -> list[list[str]] :
@@ -80,6 +115,13 @@ def compute_all_distances(
             similarityFunctions:list,
             outputLocation:str
       ) -> None:
+
+      #jaccard index avec des chaines de caractères sur les datasets directement
+      # compute_jaccard_index_over_dataset(
+      #       dataset1=dataset1,
+      #       dataset2=dataset2
+      # )
+      
       """loops through the list of similarity functions and computes the similarity between the datasets"""
       for j, similarityFunction in enumerate(similarityFunctions):
                   print(f"STEP {j} out of {len(similarityFunctions)}")
@@ -92,24 +134,18 @@ def compute_all_distances(
                   )
                   print(f"printed in : similarityFunc{j}.csv")
 
-
-print(get_dataset_description("datasetdetails_cleaned.jsonl", "task_categories"), get_prompt_description("prompts.json"))
-
 # compute_all_distances(
 #       [get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories")],
 #       [get_prompt_description("data/sim_dataset-prompt/prompts.json")],
 #       similarityFunctions
 # )
 
-datasets1 = get_dataset_description("data/sim_tasks/4/task_embeddings.jsonl", "task") # + \ get_dataset_description of another one
-datasets2 = get_dataset_description("data/sim_tasks/4/task_embeddings.jsonl", "task")
+datasets1 = get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories") # + \ get_dataset_description of another one
+datasets2 = get_prompt_description("data/sim_dataset-prompt/prompts.json")
 
 compute_all_distances(
       datasets1,
       datasets2,
       similarityFunctions,
-      outputLocation="data/sim_tasks/4/"
+      outputLocation="data/sim_dataset-prompt/"
 )
-     
-     
-     
