@@ -128,10 +128,9 @@ class Visualization:
 
 
 vizualizer = [
-      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
-      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc1.csv', ascending=True),
-      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc2.csv', ascending=False),
-      Visualization('data/data/sim_dataset-prompt/jaccard_without_embeddings.csv', ascending=False)
+      Visualization('data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
+      Visualization('data/sim_dataset-prompt/dataset0-similarityFunc1.csv', ascending=True),
+      Visualization('data/sim_dataset-prompt/dataset0-similarityFunc2.csv', ascending=False)
 ]
 # for viz in vizualizer:
 #       viz.load_data()
