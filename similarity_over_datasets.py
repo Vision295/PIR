@@ -1,9 +1,12 @@
 import json
 
+from regex import W
+
 from prompt_converter import PromptConverter
 from utils import csv_writer, similarityFunctions
 from file_manager import FileManager
 from math import fabs
+from torch import Tensor
 
 def list_to_set(list1:list[list[str]]) -> set:
       """
@@ -69,7 +72,15 @@ def get_prompt_description(promptName:str) -> list[list[str]] :
                   new_data.append([" ".join(v)])
       return new_data
 
-def compute_similarity_over_dataset(dataset1:list[list[str]], dataset2:list[list[str]], outputFileName:str, similarityFunction, location:str="csv") -> csv_writer:
+def compute_similarity_over_dataset(
+            dataset1:list[list[str]], 
+            dataset2:list[list[str]], 
+            outputFileName:str, 
+            similarityFunction, 
+            location:str="csv",
+            d1Embedding:list[float] | None=None,
+            d2Embedding:list[float] | None=None,
+      ) -> csv_writer:
       """
       inputs : 
       dataset1 and 2 : lists of list of strings, where each list is a dataset description
@@ -91,8 +102,21 @@ def compute_similarity_over_dataset(dataset1:list[list[str]], dataset2:list[list
             for j, w in enumerate(dataset1):
                   # i == 0 is the description in w, w = {"description" : ["desc_1", "desc_2", ...]}
                   if i != 0:
-                        promptConverter = PromptConverter(v, w)
-                        promptConverter.generate_embeddings()
+                        if d1Embedding is None and d2Embedding is None:
+                              promptConverter = PromptConverter(v, w)
+                              promptConverter.generate_embeddings()
+                        elif d1Embedding is None and d2Embedding is not None:
+                              promptConverter = PromptConverter(v)
+                              promptConverter.generate_embeddings()
+                              promptConverter.embeddings.append(d2Embedding[j])
+                        elif d1Embedding is not None and d2Embedding is None:
+                              promptConverter = PromptConverter(w)
+                              promptConverter.generate_embeddings()
+                              promptConverter.embeddings.append(d1Embedding[i - 1])
+                        else:
+                              promptConverter = PromptConverter("ok", "ok")
+                              print(type(d2Embedding), type(d2Embedding) is None)
+                              promptConverter.embeddings = [d1Embedding[i - 1], d2Embedding[j]]
                         promptConverter.compute_similarity(similarityFunction)
                         # stores the similarity value in : {"desc_i": [X, X, X, ..., Y, X, X, ...]} 
                         # changes Y where Y is the jth element and desc_i is the ith description
@@ -134,18 +158,39 @@ def compute_all_distances(
                   )
                   print(f"printed in : similarityFunc{j}.csv")
 
+
+
+def get_task_description(fileName:str, descriptionType:str) -> list:
+      """
+      from data get : [["desc_1"], ["desc_2"], ...]
+      where desc_X is the description of the dataset
+      """
+      with open(fileName, "r", encoding="utf-8") as file:
+            return [json.loads(line)[descriptionType] for line in file]
+
+
+
 # compute_all_distances(
 #       [get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories")],
 #       [get_prompt_description("data/sim_dataset-prompt/prompts.json")],
 #       similarityFunctions
 # )
 
+d1 = get_task_description("data/sim_tasks/1/dataset1-top_k1-top_p0.75-temp0.3.jsonl", "task")
+d2 = get_task_description("data/sim_tasks/1/dataset1-top_k1-top_p0.75-temp0.3.jsonl", "task")
+e1 = get_task_description("data/sim_tasks/1/dataset1-top_k1-top_p0.75-temp0.3.jsonl", "dataset_embedding")
+e2 = get_task_description("data/sim_tasks/1/dataset1-top_k1-top_p0.75-temp0.3.jsonl", "dataset_embedding")
+print(len(d1), len(d2), len(e1), len(e2))
+
+print(e1[0][:5], e1[1][:5])
 datasets1 = get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories") # + \ get_dataset_description of another one
 datasets2 = get_prompt_description("data/sim_dataset-prompt/prompts.json")
 
-compute_all_distances(
-      datasets1,
-      datasets2,
-      similarityFunctions,
-      outputLocation="data/sim_dataset-prompt/"
+compute_similarity_over_dataset(
+      dataset1=[[d] for d in d1],
+      dataset2=[[d] for d in d2],
+      outputFileName="ok.csv",
+      similarityFunction=similarityFunctions[0],
+      location="data/sim_tasks/1/",
+      d1Embedding=[Tensor(e) for e in e1],
 )
