@@ -1,4 +1,3 @@
-import enum
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -120,11 +119,6 @@ class Visualization:
             # Display the plot
             plt.tight_layout()
             plt.savefig(f'{self.file_path}-{name}hist-repartition.png', dpi=300, bbox_inches='tight', transparent=True)
-
-
-
-            
-
 
 
 vizualizer = [
