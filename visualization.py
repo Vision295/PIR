@@ -61,7 +61,7 @@ vizualizer = [
 #       viz.load_data()
 #       viz.top_values('text-classification')
 
-viz = Visualization('csv/dataset0-similarityFunc1.csv', ascending=True)
+viz = Visualization('data/csv2/dataset0-similarityFunc0-prompt0.csv', ascending=True)
 viz.load_data()
 viz.hit_map()
 viz.bar_chart_threshold(6.5)
