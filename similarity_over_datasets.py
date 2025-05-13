@@ -1,7 +1,5 @@
 import json
 
-from regex import W
-
 from prompt_converter import PromptConverter
 from utils import csv_writer, similarityFunctions
 from file_manager import FileManager
