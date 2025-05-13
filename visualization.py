@@ -98,7 +98,7 @@ class Visualization:
                   plt.ylabel('Values')
                   plt.xlabel('Colonnes')
                   plt.tight_layout()
-                  plt.savefig('barchart.png')
+                  plt.savefig('barchart.png', transparent=False)
                   print("barchart saved to barchart.png")
             else:
                   print("Données non chargées.")
@@ -124,7 +124,7 @@ class Visualization:
 
             # Display the plot
             plt.tight_layout()
-            plt.savefig(f'{self.file_path}-{name}hist-repartition.png', dpi=300, bbox_inches='tight', transparent=True)
+            plt.savefig(f'{self.file_path}-{name}hist-repartition.png', dpi=300, bbox_inches='tight', transparent=False)
 
 
 vizualizer = [
@@ -148,14 +148,14 @@ vizualizer = [
 
 for i, viz in enumerate(vizualizer):
       viz.load_data()
-      viz.heat_map()
-      # viz.get_repartition(simDistIndex=i)
+      # viz.heat_map()
+      viz.get_repartition(simDistIndex=i)
       # viz.top_values('text-classification', n=5)
 
-# vizualizer[0].load_data()
-# data=" ".join(["text categorization", "document classification", "content labeling", "topic identification"]),
-# vizualizer[0].zbar_chart_threshold(
-#       data=data,
-#       prompt4dataset=True
-# )
-# vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
+vizualizer[0].load_data()
+data=" ".join(["text categorization", "document classification", "content labeling", "topic identification"]),
+vizualizer[0].zbar_chart_threshold(
+      data=data,
+      prompt4dataset=True
+)
+vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
