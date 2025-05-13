@@ -9,7 +9,7 @@ from scipy.stats import wasserstein_distance
 def dot_product_similarity(x, y):
     return torch.sum(x * y, dim=1)
 
-with open("datasetdetails_cleaned.jsonl", "r", encoding="utf-8") as file:
+with open("PIR\datasetdetails_cleaned.jsonl", "r", encoding="utf-8") as file:
     data = [json.loads(line) for line in file]
 
 
@@ -28,7 +28,7 @@ def computeSimilarityOverDataset(datasetDescriptions:list[dict], similarityFunct
                   print(i, j)
                   promptConverter = PromptConverter(v, w)
                   promptConverter.generate_embeddings()
-                  promptConverter.compute_similarity(similarity_function=similarityFunction)
+                  promptConverter.compute_similarity(similarityFunction=similarityFunction)
                   similaritieList[i][j] = promptConverter.similarities[0].item()
                         
       return similaritieList

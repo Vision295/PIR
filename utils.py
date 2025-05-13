@@ -1,6 +1,8 @@
 from torch.nn.functional import cosine_similarity, pairwise_distance
 from torch import Tensor
 import torch
+from scipy.stats import wasserstein_distance
+
 
 """
       csv_writer : 
@@ -20,6 +22,7 @@ similarityFunctions = [
       lambda x: pairwise_distance(x[0], x[1], p=2),
       lambda x: cosine_similarity(x[0], x[1], dim=0),
       lambda x: jaccard_index_for_embeddings(x[0], x[1]),
+      lambda x: wasserstein_distance(x[0], x[1]),
 ]
 
 repartitionThresholds = [
