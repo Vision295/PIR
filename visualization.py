@@ -89,7 +89,11 @@ class Visualization:
             if self.df is not None:
                   numeric_df = self.df.select_dtypes(include='number')
                   # seuil
-                  filtered_df = numeric_df[numeric_df > value].dropna(axis=1, how='all')
+                  print(numeric_df)
+                  if numeric_df.empty:
+                        print("Aucune colonne numérique à afficher.")
+                        return
+                  filtered_df = numeric_df[numeric_df < value].dropna(axis=1, how='all')
 
                   # Tracer le graphique à barres
                   plt.figure(figsize=(20, 40))
@@ -102,6 +106,35 @@ class Visualization:
                   print("barchart saved to barchart.png")
             else:
                   print("Données non chargées.")
+      def bottom_prompts_all_columns(self, n=5, output_file="bottom_prompts.csv"):
+          if self.df is not None:
+              # Sélectionner uniquement les colonnes numériques
+              numeric_df = self.df.select_dtypes(include='number')
+              if numeric_df.empty:
+                  print("Aucune colonne numérique à afficher.")
+                  return
+      
+              # Créer un dictionnaire pour stocker les résultats
+              results = {}
+      
+              # Parcourir chaque colonne et récupérer les n plus petites valeurs avec leurs index (prompts)
+              for column in numeric_df.columns:
+                  smallest = numeric_df.nsmallest(n, column)
+                  results[column] = list(zip(smallest.index, smallest[column].values))  # Associer prompts et valeurs
+      
+              # Convertir les résultats en DataFrame
+              rows = []
+              for column, values in results.items():
+                  for prompt, value in values:
+                      rows.append({"Prompt": prompt, "Column": column, "Value": value})
+      
+              results_df = pd.DataFrame(rows)
+      
+              # Sauvegarder dans un fichier CSV
+              results_df.to_csv(output_file, index=False)
+              print(f"Les {n} plus petites valeurs par prompt ont été sauvegardées dans {output_file}.")
+          else:
+              print("Données non chargées.")
             
       def get_repartition(self, otherData:dict | None=None, nbins:int=90, simDistIndex=0, name:str=""):
             if otherData is not None:
@@ -127,6 +160,86 @@ class Visualization:
             plt.savefig(f'{self.file_path}-{name}hist-repartition.png', dpi=300, bbox_inches='tight', transparent=False)
 
 
+      def save_table_as_png(self, output_file="table_output.png"):
+          if self.df is not None:
+              # Créer une figure pour afficher le tableau
+              fig, ax = plt.subplots(figsize=(12, len(self.df) * 0.5 + 1))  # Ajuster la hauteur en fonction du nombre de lignes
+              ax.axis('tight')
+              ax.axis('off')
+      
+              # Créer le tableau
+              table = ax.table(
+                  cellText=self.df.values,
+                  colLabels=self.df.columns,
+                  cellLoc='center',
+                  loc='center'
+              )
+      
+              # Ajuster la taille des cellules
+              table.auto_set_font_size(False)
+              table.set_fontsize(10)
+              table.auto_set_column_width(col=list(range(len(self.df.columns))))
+      
+              # Sauvegarder le tableau en PNG
+              plt.savefig(output_file, dpi=300, bbox_inches='tight')
+              print(f"Tableau sauvegardé dans {output_file}.")
+          else:
+              print("Données non chargées.")
+      
+      def save_bottom_prompts_as_png(self, n=5, output_file="bottom_prompts_table.png"):
+          if self.df is not None:
+              # Sélectionner uniquement les colonnes numériques
+              numeric_df = self.df.select_dtypes(include='number')
+              if numeric_df.empty:
+                  print("Aucune colonne numérique à afficher.")
+                  return
+      
+              # Créer un dictionnaire pour stocker les résultats
+              results = {}
+      
+              # Parcourir chaque colonne et récupérer les n plus petites valeurs avec leurs index (prompts)
+              for column in numeric_df.columns:
+                  smallest = numeric_df.nsmallest(n, column)
+                  results[column] = list(zip(smallest.index, smallest[column].values))  # Associer prompts et valeurs
+      
+              # Convertir les résultats en DataFrame
+              rows = []
+              for column, values in results.items():
+                  for prompt, value in values:
+                      rows.append({"Prompt": prompt, "Column": column, "Value": value})
+      
+              results_df = pd.DataFrame(rows)
+      
+              # Réorganiser les données pour un tableau lisible
+              table_data = []
+              for column in numeric_df.columns:
+                  prompts = [f"{prompt} ({value})" for prompt, value in results[column]]
+                  table_data.append([column] + prompts)
+      
+              # Créer une figure pour afficher le tableau
+              fig, ax = plt.subplots(figsize=(12, len(table_data) * 0.5 + 1))  # Ajuster la hauteur en fonction des lignes
+              ax.axis('tight')
+              ax.axis('off')
+      
+              # Créer le tableau
+              table = ax.table(
+                  cellText=table_data,
+                  colLabels=["Column"] + [f"Prompt {i+1}" for i in range(n)],
+                  cellLoc='center',
+                  loc='center'
+              )
+      
+              # Ajuster la taille des cellules
+              table.auto_set_font_size(False)
+              table.set_fontsize(10)
+              table.auto_set_column_width(col=list(range(len(table_data[0]))))
+      
+              # Sauvegarder le tableau en PNG
+              plt.savefig(output_file, dpi=300, bbox_inches='tight')
+              print(f"Tableau des {n} plus petits prompts par colonne sauvegardé dans {output_file}.")
+          else:
+              print("Données non chargées.")
+
 vizualizer = [
       Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
       Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc1.csv', ascending=True),
@@ -138,11 +251,22 @@ vizualizer = [
 #       viz.load_data()
 #       viz.top_values('text-classification')
 
-# viz = Visualization('data/csv2/dataset0-similarityFunc0-prompt0.csv', ascending=True)
-# viz.load_data()
-# viz.hit_map()
-# viz.bar_chart_threshold(6.5)
+""" viz = Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc3.csv', ascending=True)
+viz.load_data()
+viz.bar_chart_threshold(0.01) """
 
+
+for i in vizualizer:
+     i.load_data()
+     i.save_bottom_prompts_as_png(n=3, output_file=f"bottom_prompts_table_func{i.file_path[-5]}.png")
+
+
+""" viz = Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc3.csv', ascending=True)
+viz.load_data()
+viz.bottom_prompts_all_columns(n=5)
+viz = Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc3.csv', ascending=True)
+viz.load_data()
+viz.save_bottom_prompts_as_png(n=3, output_file="bottom_prompts_table_func3.png") """
 # print("ok")
 #       viz.heat_map()
 

@@ -20,8 +20,8 @@ csv_writer = list[dict[str, list[str]] | dict[str, list[float]]]
 similarityFunctions = [
       lambda x: pairwise_distance(x[0], x[1], p=0.5),
       lambda x: pairwise_distance(x[0], x[1], p=2),
-      lambda x: cosine_similarity(x[0], x[1], dim=0),
-      lambda x: jaccard_index_for_embeddings(x[0], x[1]),
+      lambda x: 1 - cosine_similarity(x[0], x[1], dim=0),
+      lambda x: -jaccard_index_for_embeddings(x[0], x[1]),
       lambda x: wasserstein_distance(x[0], x[1]),
 ]
 
