@@ -158,33 +158,6 @@ class Visualization:
             # Display the plot
             plt.tight_layout()
             plt.savefig(f'{self.file_path}-{name}hist-repartition.png', dpi=300, bbox_inches='tight', transparent=False)
-
-
-      def save_table_as_png(self, output_file="table_output.png"):
-          if self.df is not None:
-              # Créer une figure pour afficher le tableau
-              fig, ax = plt.subplots(figsize=(12, len(self.df) * 0.5 + 1))  # Ajuster la hauteur en fonction du nombre de lignes
-              ax.axis('tight')
-              ax.axis('off')
-      
-              # Créer le tableau
-              table = ax.table(
-                  cellText=self.df.values,
-                  colLabels=self.df.columns,
-                  cellLoc='center',
-                  loc='center'
-              )
-      
-              # Ajuster la taille des cellules
-              table.auto_set_font_size(False)
-              table.set_fontsize(10)
-              table.auto_set_column_width(col=list(range(len(self.df.columns))))
-      
-              # Sauvegarder le tableau en PNG
-              plt.savefig(output_file, dpi=300, bbox_inches='tight')
-              print(f"Tableau sauvegardé dans {output_file}.")
-          else:
-              print("Données non chargées.")
       
       def save_bottom_prompts_as_png(self, n=5, output_file="bottom_prompts_table.png"):
           if self.df is not None:
