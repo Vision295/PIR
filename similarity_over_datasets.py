@@ -176,8 +176,8 @@ def get_task_description(fileName:str, descriptionType:str) -> list:
 #       similarityFunctions
 # )
 
-datasets1 = get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories") # + \ get_dataset_description of another one
-datasets2 = get_prompt_description("data/sim_dataset-prompt/prompts.json")
+datasets1 = get_dataset_description("data/data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories") # + \ get_dataset_description of another one
+datasets2 = get_prompt_description("data/data/sim_dataset-prompt/prompts.json")
 
 file_names = [
       "dataset1-top_k1-top_p0.75-temp0.3.jsonl",
@@ -195,16 +195,13 @@ file_names = [
 
 for i, n in enumerate([1, 2, 3, 4, 5, 6, 7, 9, 10, 20, 21]):
 
-      d1 = get_task_description(f"data/sim_tasks/{n}/{file_names[i]}", "task")
-      d2 = get_task_description(f"data/sim_tasks/{n}/{file_names[i]}", "task")
-      e1 = get_task_description(f"data/sim_tasks/{n}/{file_names[i]}", "dataset_embedding")
-      e2 = get_task_description(f"data/sim_tasks/{n}/{file_names[i]}", "dataset_embedding")
+      d1 = get_dataset_description(f"data/data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories")
+      d2 = get_prompt_description(f"data/data/sim_dataset-prompt/prompts.json")
 
       compute_similarity_over_dataset(
-            dataset1=[[d] for d in d2],
-            dataset2=[[d1[0]]],
-            outputFileName="sim_over_tasks3.csv",
+            dataset1= d1,
+            dataset2= d2 ,
+            outputFileName="sim_over_tasks4.csv",
             similarityFunction=similarityFunctions[3],
-            location=f"data/sim_tasks/{n}/",
-            d1Embedding=[Tensor(e) for e in e1],
+            location=f"data/data/sim_tasks/{n}/",
       )
