@@ -1,9 +1,12 @@
+from typing import final
+from matplotlib.rcsetup import validate_fontsizelist
+import matplotlib.cm as cm
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import textwrap
-from utils import repartitionThresholds
+from utils import repartitionThresholds, get_name_from_path
 
 class Visualization:
       def __init__(self, file_path, ascending=True):
@@ -103,14 +106,6 @@ class Visualization:
             else:
                   print("Données non chargées.")
       
-      def compute_average_score(self):
-            if self.df is not None:
-                  numeric_df = self.df.select_dtypes(include='number')
-                  average_scores = numeric_df.values.mean()
-                  return average_scores
-            else:
-                  print("Data not loaded yet.")
-                  return None
             
       def get_repartition(self, otherData:dict | None=None, nbins:int=90, simDistIndex=0, name:str=""):
             if otherData is not None:
@@ -136,6 +131,87 @@ class Visualization:
             plt.savefig(f'{self.file_path}-{name}hist-repartition.png', dpi=300, bbox_inches='tight', transparent=False)
 
 
+      def compute_average_score(self):
+            if self.df is not None:
+                  numeric_df = self.df.select_dtypes(include='number')
+                  average_scores = numeric_df.values.mean()
+                  return average_scores
+            else:
+                  print("Data not loaded yet.")
+                  return None
+      
+
+def get_n_highest_task_values(vizList:list[Visualization]) -> list[tuple]:
+      """
+      Get the top n values for a specific task across multiple visualizations.
+      """
+      results = []
+      vizDict = {}
+      for viz in vizList:
+            for i, (k, v) in enumerate(viz.df.to_dict().items()):
+                  vizDict[get_name_from_path(viz.file_path) + str(i)] = list(v.values())[0]
+      results = sorted(vizDict.items(), key=lambda x: x[1], reverse=True)
+      
+      return results
+
+def get_best_tasks_args(vizList:list[Visualization]) -> list[tuple]:
+      scores = {}
+      for viz in vizList:
+            viz.load_data()
+            scores[get_name_from_path(viz.file_path)] = viz.compute_average_score()
+      sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+      return sorted_scores
+
+def plot_best_args(vizList:list[Visualization], save_path:str, n:int=5):
+      """
+      Plot the best arguments for a specific task across multiple visualizations.
+      """
+      data = get_best_tasks_args(vizList)[:n]
+      keys = [get_name_from_path(viz.file_path) if get_name_from_path(viz.file_path) in list(map(lambda x: x[0], data)) else None for viz in vizList]
+
+      final_data = []
+      final_keys = []
+      i = 0
+      for j, v in enumerate(keys):
+            if v is not None:
+                  temp = vizList[j].df.select_dtypes(include='number').values
+                  final_keys += [v] * len(temp)
+                  final_data.append(*temp)
+                  i+=1
+
+      print(final_data, final_keys, list(map(lambda x: x[0], data)))
+      print("final_data", data)
+
+
+      plt.figure(figsize=(10, 6))
+      plt.hist(
+            final_data,
+            bins=2*n,
+            stacked=True,
+            color=[cm.get_cmap('tab20')(i) for i in range(0, 20, 1)][:len(final_data)],
+            label=final_keys,
+      )
+      plt.xlabel('Task')
+      plt.ylabel('Score')
+      plt.title('Tasks repartition among different values of top_k, top_p and temperature')
+      plt.xticks(rotation=45, ha='right')
+      plt.legend(title="Data Sources", fontsize='small', ncol=2)
+      plt.tight_layout()
+      plt.savefig(save_path, dpi=600)
+      plt.show()
+
+def get_duplicates_similarity(vizList:list[Visualization]) -> list[tuple]:
+      """
+      Get the duplicates similarity across multiple visualizations.
+      """
+      duplicates = []
+      for viz in vizList:
+            viz.load_data()
+            for i, row in viz.df.iterrows():
+                  if row['text-classification'] > 0.9:  # Assuming a threshold of 0.9 for similarity
+                        duplicates.append((i, row['text-classification']))
+      return duplicates
+
 vizualizer = [
       Visualization('data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
       Visualization('data/sim_dataset-prompt/dataset0-similarityFunc1.csv', ascending=True),
@@ -158,7 +234,7 @@ vizualizer = [
 for i, viz in enumerate(vizualizer):
       viz.load_data()
       # viz.heat_map()
-      viz.get_repartition(simDistIndex=i)
+      # viz.get_repartition(simDistIndex=i)
       # viz.top_values('text-classification', n=5)
 
 # vizualizer[0].load_data()
@@ -170,20 +246,32 @@ for i, viz in enumerate(vizualizer):
 # vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
 
 file_list = [
-      "sim_over_tasksdataset1-top_k1-top_p0.5-temp0.5.jsonl.csv",
-      "sim_over_tasksdataset1-top_k2-top_p0.5-temp0.5.jsonl.csv",
-      "sim_over_tasksdataset1-top_k3-top_p0.5-temp0.5.jsonl.csv",
-      "sim_over_tasksdataset2-top_k3-top_p0.2-temp0.5.jsonl.csv",
-      "sim_over_tasksdataset2-top_k3-top_p0.5-temp0.5.jsonl.csv",
-      "sim_over_tasksdataset2-top_k3-top_p0.9-temp0.5.jsonl.csv",
+      'dataset1-top_k1-top_p0.5-temp0.5 (2).jsonl',
+      'dataset1-top_k1-top_p0.5-temp0.5.jsonl',
+      'dataset1-top_k2-top_p0.5-temp0.5 (2).jsonl',
+      'dataset1-top_k2-top_p0.5-temp0.5.jsonl',
+      'dataset1-top_k3-top_p0.5-temp0.5 (2).jsonl',
+      'dataset1-top_k3-top_p0.5-temp0.5.jsonl',
+      'dataset2-top_k3-top_p0.2-temp0.5 (2).jsonl',
+      'dataset2-top_k3-top_p0.2-temp0.5.jsonl',
+      'dataset2-top_k3-top_p0.5-temp0.5 (2).jsonl',
+      'dataset2-top_k3-top_p0.5-temp0.5.jsonl',
+      'dataset2-top_k3-top_p0.9-temp0.5 (2).jsonl',
+      'dataset2-top_k3-top_p0.9-temp0.5.jsonl',
+      'dataset5-top_k2-top_p0.5-temp0.2 (2).jsonl',
+      'dataset5-top_k2-top_p0.5-temp0.2.jsonl',
+      'dataset5-top_k2-top_p0.5-temp0.5 (2).jsonl',
+      'dataset5-top_k2-top_p0.5-temp0.5.jsonl',
+      'dataset5-top_k2-top_p0.5-temp0.9 (2).jsonl',
+      'dataset5-top_k2-top_p0.5-temp0.9.jsonl',
 ]
 
-scores = {}
-for file in file_list:
-      viz = Visualization(f'data/sim_tasks/resultats_bis/{file}', ascending=True)
-      viz.load_data()
-      score = viz.compute_average_score()
-      scores[file] = score
-      print(score, file)
+vizList = [Visualization(f'data/sim_tasks/resultats_bis/sim_over_tasks{file}.csv', ascending=True) for file in file_list]
+for viz in vizList : viz.load_data()
 
-print(scores)
+best_res = get_best_tasks_args(vizList)
+highest_n = get_n_highest_task_values(vizList)
+plot_best_args(vizList, "data/sim_tasks/resultats_bis/top10_scores_visual.png", n=10)
+
+for i in best_res:
+      print(i[0], i[1])
