@@ -102,6 +102,15 @@ class Visualization:
                   print("barchart saved to barchart.png")
             else:
                   print("Données non chargées.")
+      
+      def compute_average_score(self):
+            if self.df is not None:
+                  numeric_df = self.df.select_dtypes(include='number')
+                  average_scores = numeric_df.values.mean()
+                  return average_scores
+            else:
+                  print("Data not loaded yet.")
+                  return None
             
       def get_repartition(self, otherData:dict | None=None, nbins:int=90, simDistIndex=0, name:str=""):
             if otherData is not None:
@@ -128,10 +137,10 @@ class Visualization:
 
 
 vizualizer = [
-      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
-      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc1.csv', ascending=True),
-      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc2.csv', ascending=False),
-      Visualization('data/data/sim_dataset-prompt/jaccard_without_embeddings.csv', ascending=False)
+      Visualization('data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
+      Visualization('data/sim_dataset-prompt/dataset0-similarityFunc1.csv', ascending=True),
+      Visualization('data/sim_dataset-prompt/dataset0-similarityFunc2.csv', ascending=False),
+      Visualization('data/sim_dataset-prompt/jaccard_without_embeddings.csv', ascending=False)
 ]
 # for viz in vizualizer:
 #       viz.load_data()
@@ -152,10 +161,29 @@ for i, viz in enumerate(vizualizer):
       viz.get_repartition(simDistIndex=i)
       # viz.top_values('text-classification', n=5)
 
-vizualizer[0].load_data()
-data=" ".join(["text categorization", "document classification", "content labeling", "topic identification"]),
-vizualizer[0].zbar_chart_threshold(
-      data=data,
-      prompt4dataset=True
-)
-vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
+# vizualizer[0].load_data()
+# data=" ".join(["text categorization", "document classification", "content labeling", "topic identification"]),
+# vizualizer[0].zbar_chart_threshold(
+#       data=data,
+#       prompt4dataset=True
+# )
+# vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
+
+file_list = [
+      "sim_over_tasksdataset1-top_k1-top_p0.5-temp0.5.jsonl.csv",
+      "sim_over_tasksdataset1-top_k2-top_p0.5-temp0.5.jsonl.csv",
+      "sim_over_tasksdataset1-top_k3-top_p0.5-temp0.5.jsonl.csv",
+      "sim_over_tasksdataset2-top_k3-top_p0.2-temp0.5.jsonl.csv",
+      "sim_over_tasksdataset2-top_k3-top_p0.5-temp0.5.jsonl.csv",
+      "sim_over_tasksdataset2-top_k3-top_p0.9-temp0.5.jsonl.csv",
+]
+
+scores = {}
+for file in file_list:
+      viz = Visualization(f'data/sim_tasks/resultats_bis/{file}', ascending=True)
+      viz.load_data()
+      score = viz.compute_average_score()
+      scores[file] = score
+      print(score, file)
+
+print(scores)
