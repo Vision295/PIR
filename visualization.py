@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import numpy as np
 import textwrap
 from utils import repartitionThresholds
 
@@ -49,13 +50,33 @@ class Visualization:
                         sns.heatmap(numeric_df, annot=True, cmap='viridis', fmt=".2f", annot_kws={"size": 8})
 
                   plt.title("Heatmap", fontsize=16)
+
+                  if numeric_df.empty:
+                        print("Aucune colonne numérique à afficher.")
+                        return
+
+                  n_rows, n_cols = numeric_df.shape
+                  cell_size = 1.0 
+                  figsize_x = max(10, n_cols * cell_size)
+                  figsize_y = max(10, n_rows * cell_size)
+
+                  plt.figure(figsize=(figsize_x, figsize_y))
+                  sns.heatmap(numeric_df, annot=True, cmap='viridis', fmt=".2f", annot_kws={"size": 8})
+
+                  plt.title("Heatmap", fontsize=16)
                   plt.tight_layout()
 
                   save_path = self.file_path[:-3] + 'heatmap.png'
                   plt.savefig(save_path, dpi=300)
                   plt.close()
                   print(f"heat save to {save_path}")
+
+                  save_path = self.file_path[:-3] + 'heatmap.png'
+                  plt.savefig(save_path, dpi=300)
+                  plt.close()
+                  print(f"heat save to {save_path}")
             else:
+                  print("Pas de donnees")
                   print("Pas de donnees")
 
 
@@ -84,6 +105,7 @@ class Visualization:
             for i in self.promptsPerThreshold:
                   print(i)
                   
+                  
 
       def bar_chart_threshold(self, value):
             if self.df is not None:
@@ -99,6 +121,8 @@ class Visualization:
                   plt.xlabel('Colonnes')
                   plt.tight_layout()
                   plt.savefig('barchart.png', transparent=False)
+                  print("barchart saved to barchart.png")
+                  plt.savefig('barchart.png')
                   print("barchart saved to barchart.png")
             else:
                   print("Données non chargées.")
@@ -128,9 +152,9 @@ class Visualization:
 
 
 vizualizer = [
-      Visualization('data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
-      Visualization('data/sim_dataset-prompt/dataset0-similarityFunc1.csv', ascending=True),
-      Visualization('data/sim_dataset-prompt/dataset0-similarityFunc2.csv', ascending=False)
+      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
+      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc1.csv', ascending=True),
+      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc2.csv', ascending=False)
 ]
 # for viz in vizualizer:
 #       viz.load_data()
@@ -140,10 +164,15 @@ vizualizer = [
 # viz.load_data()
 # viz.hit_map()
 # viz.bar_chart_threshold(6.5)
+# viz = Visualization('data/csv2/dataset0-similarityFunc0-prompt0.csv', ascending=True)
+# viz.load_data()
+# viz.hit_map()
+# viz.bar_chart_threshold(6.5)
 
 print("ok")
 
 
+# print("ok")
 #       viz.heat_map()
 
 
@@ -152,11 +181,16 @@ for i, viz in enumerate(vizualizer):
       # viz.heat_map()
       viz.get_repartition(simDistIndex=i)
       # viz.top_values('text-classification', n=5)
+for i, viz in enumerate(vizualizer):
+      viz.load_data()
+      viz.heat_map()
+      # viz.get_repartition(simDistIndex=i)
+      # viz.top_values('text-classification', n=5)
 
-vizualizer[0].load_data()
-data=" ".join(["text categorization", "document classification", "content labeling", "topic identification"]),
-vizualizer[0].zbar_chart_threshold(
-      data=data,
-      prompt4dataset=True
-)
-vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
+# vizualizer[0].load_data()
+# data=" ".join(["text categorization", "document classification", "content labeling", "topic identification"]),
+# vizualizer[0].zbar_chart_threshold(
+#       data=data,
+#       prompt4dataset=True
+# )
+# vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
