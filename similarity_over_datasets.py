@@ -178,17 +178,24 @@ datasets1 = get_dataset_description("data/sim_dataset-prompt/datasetdetails_clea
 datasets2 = get_prompt_description("data/sim_dataset-prompt/prompts.json")
 
 file_names = [
-      "dataset1-top_k1-top_p0.75-temp0.3.jsonl",
-      "dataset2-top_k1-top_p0.9-temp0.5.jsonl",
-      "dataset3-top_k1-top_p0.3-temp0.5.jsonl",
-      "dataset4-top_k1-top_p0.75-temp0.9.jsonl",
-      "dataset5-top_k1-top_p0.9-temp0.9.jsonl",
-      "dataset6-top_k2-top_p0.3-temp0.3.jsonl",
-      "dataset7-top_k10-top_p0.5-temp0.5.jsonl",
-      "dataset9-top_k2-top_p0.3-temp0.5.jsonl",
-      "dataset10-top_k3-top_p0.75-temp0.9.jsonl",
-      "dataset20-top_k4-top_p0.9-temp1.0.jsonl",
-      "dataset21-top_k4-top_p0.85-temp0.7.jsonl"
+      'dataset1-top_k1-top_p0.5-temp0.5 (2).jsonl',
+      'dataset1-top_k1-top_p0.5-temp0.5.jsonl',
+      'dataset1-top_k2-top_p0.5-temp0.5 (2).jsonl',
+      'dataset1-top_k2-top_p0.5-temp0.5.jsonl',
+      'dataset1-top_k3-top_p0.5-temp0.5 (2).jsonl',
+      'dataset1-top_k3-top_p0.5-temp0.5.jsonl',
+      'dataset2-top_k3-top_p0.2-temp0.5 (2).jsonl',
+      'dataset2-top_k3-top_p0.2-temp0.5.jsonl',
+      'dataset2-top_k3-top_p0.5-temp0.5 (2).jsonl',
+      'dataset2-top_k3-top_p0.5-temp0.5.jsonl',
+      'dataset2-top_k3-top_p0.9-temp0.5 (2).jsonl',
+      'dataset2-top_k3-top_p0.9-temp0.5.jsonl',
+      'dataset5-top_k2-top_p0.5-temp0.2 (2).jsonl',
+      'dataset5-top_k2-top_p0.5-temp0.2.jsonl',
+      'dataset5-top_k2-top_p0.5-temp0.5 (2).jsonl',
+      'dataset5-top_k2-top_p0.5-temp0.5.jsonl',
+      'dataset5-top_k2-top_p0.5-temp0.9 (2).jsonl',
+      'dataset5-top_k2-top_p0.5-temp0.9.jsonl',
 ]
 
 def compute_sim_tasks():
@@ -210,15 +217,21 @@ def compute_sim_tasks():
 
 task_list = [
       "dataset1-top_k1-top_p0.5-temp0.5.jsonl",
+      "dataset1-top_k1-top_p0.5-temp0.5.jsonl2",
       "dataset1-top_k2-top_p0.5-temp0.5.jsonl",
+      "dataset1-top_k2-top_p0.5-temp0.5.jsonl2",
       "dataset1-top_k3-top_p0.5-temp0.5.jsonl",
+      "dataset1-top_k3-top_p0.5-temp0.5.jsonl2",
       "dataset2-top_k3-top_p0.2-temp0.5.jsonl",
+      "dataset2-top_k3-top_p0.2-temp0.5.jsonl2",
       "dataset2-top_k3-top_p0.5-temp0.5.jsonl",
+      "dataset2-top_k3-top_p0.5-temp0.5.jsonl2",
       "dataset2-top_k3-top_p0.9-temp0.5.jsonl",
+      "dataset2-top_k3-top_p0.9-temp0.5.jsonl2",
 ]
 
 def compute_sim_task2():
-      for i in  task_list:
+      for i in file_names:
             d1 = get_task_description(f"data/sim_tasks/resultats_bis/{i}", "task")
             e1 = get_task_description(f"data/sim_tasks/resultats_bis/{i}", "dataset_embedding")
             compute_similarity_over_dataset(
