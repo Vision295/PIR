@@ -120,6 +120,16 @@ vizualizer = [
 ]
 # for viz in vizualizer:
 #       viz.load_data()
+#       viz.top_values('text-classification')
+
+viz = Visualization('data/csv2/dataset0-similarityFunc0-prompt0.csv', ascending=True)
+viz.load_data()
+viz.hit_map()
+viz.bar_chart_threshold(6.5)
+
+print("ok")
+
+
 #       viz.heat_map()
 
 
