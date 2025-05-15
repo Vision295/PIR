@@ -55,6 +55,12 @@ def remove_duplicates(inputFile:str = "datasetdetails.jsonl", outputFile:str= "d
 
 #remove_duplicates("datasetdetails.jsonl")
 
+def get_name_from_path(path:str) -> str:
+      """
+      Extracts the name of the file from a given path.
+      """
+      return path.rsplit('/', 1)[-1]
+
 
 print(
       cosine_similarity(
