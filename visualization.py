@@ -150,6 +150,8 @@ class Visualization:
             plt.tight_layout()
             plt.savefig(f'{self.file_path}-{name}hist-repartition.png', dpi=300, bbox_inches='tight', transparent=False)
 
+            plt.savefig(f'{self.file_path}-{name}hist-repartition.png', dpi=300, bbox_inches='tight', transparent=True)
+
 
 vizualizer = [
       Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
