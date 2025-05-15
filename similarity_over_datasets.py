@@ -191,18 +191,21 @@ file_names = [
       "dataset21-top_k4-top_p0.85-temp0.7.jsonl"
 ]
 
-for i, n in enumerate([1, 2, 3, 4, 5, 6, 7, 9, 10, 20, 21]):
+def compute_sim_over_tasks():
+      for i, n in enumerate([1, 2, 3, 4, 5, 6, 7, 9, 10, 20, 21]):
 
-      d1 = get_task_description(f"data/sim_tasks/{n}/{file_names[i]}", "task")
-      d2 = get_task_description(f"data/sim_tasks/{n}/{file_names[i]}", "task")
-      e1 = get_task_description(f"data/sim_tasks/{n}/{file_names[i]}", "dataset_embedding")
-      e2 = get_task_description(f"data/sim_tasks/{n}/{file_names[i]}", "dataset_embedding")
+            d1 = get_task_description(f"data/sim_tasks/{n}/{file_names[i]}", "task")
+            d2 = get_task_description(f"data/sim_tasks/{n}/{file_names[i]}", "task")
+            e1 = get_task_description(f"data/sim_tasks/{n}/{file_names[i]}", "dataset_embedding")
+            e2 = get_task_description(f"data/sim_tasks/{n}/{file_names[i]}", "dataset_embedding")
 
-      compute_similarity_over_dataset(
-            dataset1=[[d] for d in d2],
-            dataset2=[[d1[0]]],
-            outputFileName="sim_over_tasks3.csv",
-            similarityFunction=similarityFunctions[3],
-            location=f"data/sim_tasks/{n}/",
-            d1Embedding=[Tensor(e) for e in e1],
-      )
+            compute_similarity_over_dataset(
+                  dataset1=[[d] for d in d2],
+                  dataset2=[[d1[0]]],
+                  outputFileName="sim_over_tasks3.csv",
+                  similarityFunction=similarityFunctions[3],
+                  location=f"data/sim_tasks/{n}/",
+                  d1Embedding=[Tensor(e) for e in e1],
+            )
+
+
