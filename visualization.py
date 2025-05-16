@@ -1,8 +1,6 @@
-import matplotlib.cm as cm
 import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sns
-import numpy as np
 import textwrap
 from utils import repartitionThresholds, get_name_from_path
 
@@ -14,7 +12,7 @@ class Visualization:
 
       def load_data(self):
             self.df = pd.read_csv(self.file_path, index_col=0)
-            # print(self.df.head())
+            print(self.df.head())
 
       def top_values(self, column_name, n=5):
             if self.df is not None:
@@ -44,7 +42,7 @@ class Visualization:
                   figsize_y = max(10, n_rows * cell_size)
 
                   plt.figure(figsize=(figsize_x, figsize_y))
-                  if self.file_path == 'data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv':
+                  if self.file_path == 'data/sim_tasks/task_selection/similarity_voer_tasks.csv':
                         sns.heatmap(numeric_df, annot=True, cmap='viridis', fmt="d", annot_kws={"size": 8})
                   else:
                         sns.heatmap(numeric_df, annot=True, cmap='viridis', fmt=".2f", annot_kws={"size": 8})
@@ -195,7 +193,7 @@ def plot_best_args(vizList:list[Visualization], save_path:str, n:int=5):
             final_data,
             bins=2*n,
             stacked=True,
-            color=colors[:6],
+            color=colors[:5],
             label=final_keys,
       )
       plt.xlabel('Task')
@@ -238,8 +236,8 @@ vizualizer = [
 #       viz.heat_map()
 
 
-for i, viz in enumerate(vizualizer):
-      viz.load_data()
+# for i, viz in enumerate(vizualizer):
+#       viz.load_data()
       # viz.heat_map()
       # viz.get_repartition(simDistIndex=i)
       # viz.top_values('text-classification', n=5)
@@ -252,39 +250,43 @@ for i, viz in enumerate(vizualizer):
 # )
 # vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
 
-file_list = [
-      "dataset1-top_k2-top_p0.3-temp0.6.jsonl",
-      "dataset1-top_k2-top_p0.4-temp0.4.jsonl",
-      "dataset1-top_k2-top_p0.6-temp0.3.jsonl",
-      "dataset1-top_k4-top_p0.3-temp0.6.jsonl",
-      "dataset1-top_k4-top_p0.4-temp0.4.jsonl",
-      "dataset1-top_k4-top_p0.6-temp0.3.jsonl",
-]
+def compute_args_rating():
+      file_list = [
+            "dataset1-top_k2-top_p0.3-temp0.6.jsonl",
+            "dataset1-top_k2-top_p0.6-temp0.3.jsonl",
+            "dataset1-top_k4-top_p0.3-temp0.6.jsonl",
+            "dataset1-top_k4-top_p0.4-temp0.4.jsonl",
+            "dataset1-top_k4-top_p0.6-temp0.3.jsonl",
+      ]
 
-vizList = [Visualization(f'data/sim_tasks/diff_args/sim_over_tasks{file}.csv', ascending=True) for file in file_list]
-for viz in vizList : viz.load_data()
+      vizList = [Visualization(f'data/sim_tasks/diff_args/sim_over_tasks{file}.csv', ascending=True) for file in file_list]
+      for viz in vizList : viz.load_data()
 
-best_res = get_best_tasks_args(vizList, average=True)
-best_res_std = get_best_tasks_args(vizList, average=False)
-highest_n = get_n_highest_task_values(vizList)
+      best_res = get_best_tasks_args(vizList, average=True)
+      best_res_std = get_best_tasks_args(vizList, average=False)
+      highest_n = get_n_highest_task_values(vizList)
 
-print("\n------------------- SORTED MEANS -----------------\n")
-for v in best_res: print(v[0], v[1])
-print("\n------------------- SORTED STDS -----------------\n")
-for v in best_res_std: print(v[0], v[1])
+      print("\n------------------- SORTED MEANS -----------------\n")
+      for v in best_res: print(v[0], v[1])
+      print("\n------------------- SORTED STDS -----------------\n")
+      for v in best_res_std: print(v[0], v[1])
 
-rankings = {v[0][:56]: i for i, v in enumerate(best_res)}
-# for i, v in enumerate(highest_n):
-#       rankings[v[0][:56]] += i
-print("\n------------------- RANKINGS -----------------\n")
-for i, v in rankings.items():
-      print(i, v)
+      rankings = {v[0]: 0 for v in best_res}
+      for i, v in enumerate(highest_n):
+            rankings[v[0][:56]] += i
+      print("\n------------------- RANKINGS -----------------\n")
+      for i, v in rankings.items():
+            print(i, v)
 
-print("\n------------------- SORTED VALUES -----------------\n")
-for v in highest_n:
-      print(v[0], v[1])
-plot_best_args(vizList, "data/sim_tasks/diff_args/top9_scores_visual_no_duplicates.png", n=9)
+      print("\n------------------- SORTED VALUES -----------------\n")
+      for v in highest_n:
+            print(v[0], v[1])
+      plot_best_args(vizList, "data/sim_tasks/diff_args/top9_scores_visual_no_duplicates.png", n=9)
 
 
-for i in best_res:
-      print(i[0], i[1])
+      for i in best_res:
+            print(i[0], i[1])
+      
+viz = Visualization('data/sim_tasks/task_selection/similarity_over_tasks.csv', ascending=True)
+viz.load_data()
+viz.heat_map()
