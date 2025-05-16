@@ -1,5 +1,7 @@
 import json
 
+from regex import W
+
 from prompt_converter import PromptConverter
 from utils import csv_writer, similarityFunctions
 from file_manager import FileManager
@@ -220,4 +222,4 @@ def compute_sim_task2():
             )
 
 
-compute_sim_task2()
+print(get_task_description("data/sim_tasks/task_selection/merged_dataset.jsonl", "task"))
