@@ -208,4 +208,15 @@ def compute_sim_over_tasks():
                   d1Embedding=[Tensor(e) for e in e1],
             )
 
+def compute_tasks_sim():
+      compute_similarity_over_dataset(
+            dataset1=get_task_description("data/sim_tasks/task_selection/merged_dataset.jsonl", "task"),
+            dataset2=get_task_description("data/sim_tasks/task_selection/merged_dataset.jsonl", "task"),
+            outputFileName="similarity_over_tasks.csv",
+            similarityFunction=similarityFunctions[2],
+            location="data/sim_dataset-sim_tasks/task_selection/",
+            d1Embedding=None,
+            d2Embedding=None
+      )
 
+compute_tasks_sim()
