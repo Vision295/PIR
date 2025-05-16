@@ -1,9 +1,7 @@
-from typing import final
-from matplotlib.rcsetup import validate_fontsizelist
 import matplotlib.cm as cm
 import pandas as pd
-import matplotlib/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/pyplot as plt
-import seaborn as/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/task_selection/sns
+from matplotlib import pyplot as plt
+import seaborn as sns
 import numpy as np
 import textwrap
 from utils import repartitionThresholds, get_name_from_path
@@ -131,11 +129,12 @@ class Visualization:
             plt.savefig(f'{self.file_path}-{name}hist-repartition.png', dpi=300, bbox_inches='tight', transparent=False)
 
 
-      def compute_average_score(self):
+      def compute_average_std_score(self, average_score:bool=True):
             if self.df is not None:
                   numeric_df = self.df.select_dtypes(include='number')
                   average_scores = numeric_df.values.mean()
-                  return average_scores
+                  std_scores = numeric_df.values.std()
+                  return average_scores if average_score else std_scores
             else:
                   print("Data not loaded yet.")
                   return None
@@ -154,11 +153,11 @@ def get_n_highest_task_values(vizList:list[Visualization]) -> list[tuple]:
       
       return results
 
-def get_best_tasks_args(vizList:list[Visualization]) -> list[tuple]:
+def get_best_tasks_args(vizList:list[Visualization], average:bool=True) -> list[tuple]:
       scores = {}
       for viz in vizList:
             viz.load_data()
-            scores[get_name_from_path(viz.file_path)] = viz.compute_average_score()
+            scores[get_name_from_path(viz.file_path)] = viz.compute_average_std_score(average)
       sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
       return sorted_scores
 
@@ -179,16 +178,24 @@ def plot_best_args(vizList:list[Visualization], save_path:str, n:int=5):
                   final_data.append(*temp)
                   i+=1
 
-      print(final_data, final_keys, list(map(lambda x: x[0], data)))
-      print("final_data", data)
-
+      colors = [
+            '#1f77b4',  # blue
+            '#ff7f0e',  # orange
+            '#2ca02c',  # green
+            '#d62728',  # red
+            '#9467bd',  # purple
+            '#8c564b',  # brown
+            '#e377c2',  # pink
+            '#7f7f7f',  # gray
+            '#bcbd22'   # yellow-green
+      ]
 
       plt.figure(figsize=(10, 6))
       plt.hist(
             final_data,
             bins=2*n,
             stacked=True,
-            color=[cm.get_cmap('tab20')(i) for i in range(0, 20, 1)][:len(final_data)],
+            color=colors[:6],
             label=final_keys,
       )
       plt.xlabel('Task')
@@ -246,32 +253,38 @@ for i, viz in enumerate(vizualizer):
 # vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
 
 file_list = [
-      'dataset1-top_k1-top_p0.5-temp0.5 (2).jsonl',
-      'dataset1-top_k1-top_p0.5-temp0.5.jsonl',
-      'dataset1-top_k2-top_p0.5-temp0.5 (2).jsonl',
-      'dataset1-top_k2-top_p0.5-temp0.5.jsonl',
-      'dataset1-top_k3-top_p0.5-temp0.5 (2).jsonl',
-      'dataset1-top_k3-top_p0.5-temp0.5.jsonl',
-      'dataset2-top_k3-top_p0.2-temp0.5 (2).jsonl',
-      'dataset2-top_k3-top_p0.2-temp0.5.jsonl',
-      'dataset2-top_k3-top_p0.5-temp0.5 (2).jsonl',
-      'dataset2-top_k3-top_p0.5-temp0.5.jsonl',
-      'dataset2-top_k3-top_p0.9-temp0.5 (2).jsonl',
-      'dataset2-top_k3-top_p0.9-temp0.5.jsonl',
-      'dataset5-top_k2-top_p0.5-temp0.2 (2).jsonl',
-      'dataset5-top_k2-top_p0.5-temp0.2.jsonl',
-      'dataset5-top_k2-top_p0.5-temp0.5 (2).jsonl',
-      'dataset5-top_k2-top_p0.5-temp0.5.jsonl',
-      'dataset5-top_k2-top_p0.5-temp0.9 (2).jsonl',
-      'dataset5-top_k2-top_p0.5-temp0.9.jsonl',
+      "dataset1-top_k2-top_p0.3-temp0.6.jsonl",
+      "dataset1-top_k2-top_p0.4-temp0.4.jsonl",
+      "dataset1-top_k2-top_p0.6-temp0.3.jsonl",
+      "dataset1-top_k4-top_p0.3-temp0.6.jsonl",
+      "dataset1-top_k4-top_p0.4-temp0.4.jsonl",
+      "dataset1-top_k4-top_p0.6-temp0.3.jsonl",
 ]
 
-vizList = [Visualization(f'data/sim_tasks/resultats_bis/sim_over_tasks{file}.csv', ascending=True) for file in file_list]
+vizList = [Visualization(f'data/sim_tasks/diff_args/sim_over_tasks{file}.csv', ascending=True) for file in file_list]
 for viz in vizList : viz.load_data()
 
-best_res = get_best_tasks_args(vizList)
+best_res = get_best_tasks_args(vizList, average=True)
+best_res_std = get_best_tasks_args(vizList, average=False)
 highest_n = get_n_highest_task_values(vizList)
-plot_best_args(vizList, "data/sim_tasks/resultats_bis/top10_scores_visual.png", n=10)
+
+print("\n------------------- SORTED MEANS -----------------\n")
+for v in best_res: print(v[0], v[1])
+print("\n------------------- SORTED STDS -----------------\n")
+for v in best_res_std: print(v[0], v[1])
+
+rankings = {v[0][:56]: i for i, v in enumerate(best_res)}
+# for i, v in enumerate(highest_n):
+#       rankings[v[0][:56]] += i
+print("\n------------------- RANKINGS -----------------\n")
+for i, v in rankings.items():
+      print(i, v)
+
+print("\n------------------- SORTED VALUES -----------------\n")
+for v in highest_n:
+      print(v[0], v[1])
+plot_best_args(vizList, "data/sim_tasks/diff_args/top9_scores_visual_no_duplicates.png", n=9)
+
 
 for i in best_res:
       print(i[0], i[1])
