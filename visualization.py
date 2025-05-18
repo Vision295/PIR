@@ -1,5 +1,6 @@
 import pandas as pd
 from matplotlib import pyplot as plt
+from regex import W
 import seaborn as sns
 import textwrap
 from utils import repartitionThresholds, get_name_from_path
@@ -12,7 +13,6 @@ class Visualization:
 
       def load_data(self):
             self.df = pd.read_csv(self.file_path, index_col=0)
-            print(self.df.head())
 
       def top_values(self, column_name, n=5):
             if self.df is not None:
@@ -159,6 +159,46 @@ def get_best_tasks_args(vizList:list[Visualization], average:bool=True) -> list[
       sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
       return sorted_scores
 
+def plot_best_values(vizList:list[Visualization], save_path:str, n:int=5):
+      """
+      Plot the best arguments for a specific task across multiple visualizations.
+      """
+      for viz in vizList : viz.load_data()
+      keys = [get_name_from_path(viz.file_path) for viz in vizList]
+      data = []
+      for viz in vizList:
+            data += [list(viz.df.select_dtypes(include='number').values[0])]
+      
+      print(data)
+
+      colors = [
+            '#1f77b4',  # blue
+            '#ff7f0e',  # orange
+            '#2ca02c',  # green
+            '#d62728',  # red
+            '#9467bd',  # purple
+            '#8c564b',  # brown
+            '#e377c2',  # pink
+            '#7f7f7f',  # gray
+            '#bcbd22'   # yellow-green
+      ]
+
+      plt.figure(figsize=(10, 6))
+      plt.hist(
+            data,
+            bins=2*n,
+            stacked=True,
+            color=colors[:9],
+            label=keys,
+      )
+      plt.xlabel('Task')
+      plt.ylabel('Score')
+      plt.title('Tasks repartition among different values of top_k, top_p and temperature')
+      plt.xticks(rotation=45, ha='right')
+      plt.legend(title="Data Sources", fontsize='small', ncol=2)
+      plt.tight_layout()
+      plt.savefig(save_path, dpi=600)
+      plt.show()
 def plot_best_args(vizList:list[Visualization], save_path:str, n:int=5):
       """
       Plot the best arguments for a specific task across multiple visualizations.
@@ -190,11 +230,11 @@ def plot_best_args(vizList:list[Visualization], save_path:str, n:int=5):
 
       plt.figure(figsize=(10, 6))
       plt.hist(
-            final_data,
-            bins=2*n,
+            [[i] for i in map(lambda x: x[1], data)],
+            bins=5*n,
             stacked=True,
-            color=colors[:5],
-            label=final_keys,
+            color=colors[:9],
+            label=list(map(lambda x: x[0], data)),
       )
       plt.xlabel('Task')
       plt.ylabel('Score')
@@ -258,8 +298,35 @@ def compute_args_rating():
             "dataset1-top_k4-top_p0.4-temp0.4.jsonl",
             "dataset1-top_k4-top_p0.6-temp0.3.jsonl",
       ]
+      file_list = [
+            "dataset1-top_k1-top_p0.5-temp0.5 (2).jsonl",
+            "dataset1-top_k1-top_p0.5-temp0.5.jsonl",
+            "dataset1-top_k2-top_p0.5-temp0.5 (2).jsonl",
+            "dataset1-top_k2-top_p0.5-temp0.5.jsonl",
+            "dataset1-top_k3-top_p0.5-temp0.5 (2).jsonl",
+            "dataset1-top_k3-top_p0.5-temp0.5.jsonl",
+      ]
+      file_list = [
+            "dataset2-top_k3-top_p0.2-temp0.5 (2).jsonl",
+            "dataset2-top_k3-top_p0.2-temp0.5.jsonl",
+            "dataset2-top_k3-top_p0.5-temp0.5 (2).jsonl",
+            "dataset2-top_k3-top_p0.5-temp0.5.jsonl",
+            "dataset2-top_k3-top_p0.9-temp0.5 (2).jsonl",
+            "dataset2-top_k3-top_p0.9-temp0.5.jsonl",
+      ]
 
-      vizList = [Visualization(f'data/sim_tasks/diff_args/sim_over_tasks{file}.csv', ascending=True) for file in file_list]
+      file_list = [
+            "dataset1-top_k2-top_p0.3-temp0.6.jsonl",
+            "dataset1-top_k2-top_p0.4-temp0.4.jsonl",
+            "dataset1-top_k2-top_p0.6-temp0.3.jsonl",
+            "dataset1-top_k4-top_p0.3-temp0.6.jsonl",
+            "dataset1-top_k4-top_p0.4-temp0.4.jsonl",
+            "dataset1-top_k4-top_p0.6-temp0.3.jsonl",
+            "dataset7-top_k2-top_p0.5-temp0.2.jsonl",
+            "dataset7-top_k3-top_p0.2-temp0.5.jsonl",
+            "dataset7-top_k3-top_p0.5-temp0.5.jsonl",
+      ]
+      vizList = [Visualization(f'data/sim_tasks/diff_args/dataset1/precision/sim_over_tasks{file}.csv', ascending=True) for file in file_list]
       for viz in vizList : viz.load_data()
 
       best_res = get_best_tasks_args(vizList, average=True)
@@ -273,7 +340,10 @@ def compute_args_rating():
 
       rankings = {v[0]: 0 for v in best_res}
       for i, v in enumerate(highest_n):
-            rankings[v[0][:56]] += i
+            if v[0][:56] in rankings.keys():
+                  rankings[v[0][:56]] += i
+            else:
+                  rankings[v[0][:60]] = i
       print("\n------------------- RANKINGS -----------------\n")
       for i, v in rankings.items():
             print(i, v)
@@ -281,12 +351,17 @@ def compute_args_rating():
       print("\n------------------- SORTED VALUES -----------------\n")
       for v in highest_n:
             print(v[0], v[1])
-      plot_best_args(vizList, "data/sim_tasks/diff_args/top9_scores_visual_no_duplicates.png", n=9)
+      plot_best_values(vizList, "data/sim_tasks/diff_args/dataset1/precision/hist_scores_visual_no_duplicates.png", n=9)
+      plot_best_values(vizList, "data/sim_tasks/diff_args/dataset1/precision/hq_hist_scores_visual_no_duplicates.png", n=35)
+      plot_best_args(vizList, "data/sim_tasks/diff_args/dataset1/precision/hist_mean_scores_visual_no_duplicates.png", n=25)
 
 
       for i in best_res:
             print(i[0], i[1])
       
-viz = Visualization('data/sim_tasks/task_selection/similarity_over_tasks.csv', ascending=True)
-viz.load_data()
-viz.heat_map()
+
+compute_args_rating()
+
+# viz = Visualization('data/sim_tasks/task_selection/similarity_over_tasks.csv', ascending=True)
+# viz.load_data()
+# viz.heat_map()
