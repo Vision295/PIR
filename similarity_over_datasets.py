@@ -113,10 +113,11 @@ def compute_similarity_over_dataset(
                               promptConverter = PromptConverter(w)
                               promptConverter.generate_embeddings()
                               promptConverter.embeddings.append(d1Embedding[i - 1])
-                        else:
-                              promptConverter = PromptConverter("ok", "ok")
-                              print(type(d2Embedding), type(d2Embedding) is None)
+                        elif d1Embedding is not None and d2Embedding is not None:
+                              promptConverter = PromptConverter("kfdjsqmlfjdsklm", "ok1")
                               promptConverter.embeddings = [d1Embedding[i - 1], d2Embedding[j]]
+                        # print(promptConverter.embeddings, sum([float(d) for d in promptConverter.embeddings[0][0]]))
+                        # exit()
                         promptConverter.compute_similarity(similarityFunction)
                         # stores the similarity value in : {"desc_i": [X, X, X, ..., Y, X, X, ...]} 
                         # changes Y where Y is the jth element and desc_i is the ith description
@@ -160,13 +161,13 @@ def compute_all_distances(
 
 
 
-def get_task_description(fileName:str, descriptionType:str) -> list:
+def get_task_description(fileName:str, descriptionType:str=None) -> list:
       """
       from data get : [["desc_1"], ["desc_2"], ...]
       where desc_X is the description of the dataset
       """
       with open(fileName, "r", encoding="utf-8") as file:
-            return [json.loads(line)[descriptionType] for line in file]
+            return [json.loads(line)[descriptionType if descriptionType is not None else f"avg_task_{i}_embedding"] for i, line in enumerate(file)]
 
 
 
@@ -178,6 +179,42 @@ def get_task_description(fileName:str, descriptionType:str) -> list:
 
 datasets1 = get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories") # + \ get_dataset_description of another one
 datasets2 = get_prompt_description("data/sim_dataset-prompt/prompts.json")
+
+file_names = [
+      "dataset1-top_k2-top_p0.3-temp0.6.jsonl",
+      "dataset1-top_k2-top_p0.6-temp0.3.jsonl",
+      "dataset1-top_k4-top_p0.3-temp0.6.jsonl",
+      "dataset1-top_k4-top_p0.4-temp0.4.jsonl",
+      "dataset1-top_k4-top_p0.6-temp0.3.jsonl",
+]
+
+file_names = [
+      "dataset2-top_k1-top_p0.5-temp0.5 (2).jsonl",
+      "dataset2-top_k1-top_p0.5-temp0.5.jsonl",
+      "dataset2-top_k2-top_p0.5-temp0.5 (2).jsonl",
+      "dataset2-top_k2-top_p0.5-temp0.5.jsonl",
+      "dataset2-top_k3-top_p0.5-temp0.5 (2).jsonl",
+      "dataset2-top_k3-top_p0.5-temp0.5.jsonl",
+]
+
+file_names = [
+      "dataset2-top_k3-top_p0.2-temp0.5 (2).jsonl",
+      "dataset2-top_k3-top_p0.2-temp0.5.jsonl",
+      "dataset2-top_k3-top_p0.5-temp0.5 (2).jsonl",
+      "dataset2-top_k3-top_p0.5-temp0.5.jsonl",
+      "dataset2-top_k3-top_p0.9-temp0.5 (2).jsonl",
+      "dataset2-top_k3-top_p0.9-temp0.5.jsonl",
+]
+
+file_names = [
+      "dataset5-top_k2-top_p0.5-temp0.2 (2).jsonl",
+      "dataset5-top_k2-top_p0.5-temp0.2.jsonl",
+      "dataset5-top_k2-top_p0.5-temp0.5 (2).jsonl",
+      "dataset5-top_k2-top_p0.5-temp0.5.jsonl",
+      "dataset5-top_k2-top_p0.5-temp0.9 (2).jsonl",
+      "dataset5-top_k2-top_p0.5-temp0.9.jsonl",
+
+]
 
 file_names = [
       "dataset1-top_k2-top_p0.3-temp0.6.jsonl",
@@ -210,16 +247,18 @@ def compute_sim_tasks():
 
 def compute_sim_task2():
       for i in file_names:
-            d1 = get_task_description(f"data/sim_tasks/diff_args/{i}", "task")
-            e1 = get_task_description(f"data/sim_tasks/diff_args/{i}", "dataset_embedding")
+            d1 = get_task_description(f"data/sim_tasks/diff_args/dataset1/precision/{i}", "task")
+            e1 = get_task_description(f"data/sim_tasks/diff_args/dataset1/precision/{i}")
+            e2 = get_task_description(f"data/sim_tasks/diff_args/dataset1/precision/{i}", "dataset_embedding")
             compute_similarity_over_dataset(
                   dataset1=[[d] for d in d1],
                   dataset2=[[d1[0]]],
                   outputFileName=f"sim_over_tasks{i}.csv",
                   similarityFunction=similarityFunctions[2],
-                  location="data/sim_tasks/diff_args/",
-                  d1Embedding=[Tensor(e) for e in e1], 
+                  location="data/sim_tasks/diff_args/dataset1/precision",
+                  d2Embedding=[[Tensor(e)] for e in e1] if e1 else None, 
+                  d1Embedding=[[Tensor(e)] for e in e2] if e2 else None,
             )
 
 
-print(get_task_description("data/sim_tasks/task_selection/merged_dataset.jsonl", "task"))
+compute_sim_task2()
