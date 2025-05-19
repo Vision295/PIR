@@ -180,13 +180,6 @@ def get_task_description(fileName:str, descriptionType:str=None) -> list:
 datasets1 = get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories") # + \ get_dataset_description of another one
 datasets2 = get_prompt_description("data/sim_dataset-prompt/prompts.json")
 
-file_names = [
-      "dataset1-top_k2-top_p0.3-temp0.6.jsonl",
-      "dataset1-top_k2-top_p0.6-temp0.3.jsonl",
-      "dataset1-top_k4-top_p0.3-temp0.6.jsonl",
-      "dataset1-top_k4-top_p0.4-temp0.4.jsonl",
-      "dataset1-top_k4-top_p0.6-temp0.3.jsonl",
-]
 
 file_names = [
       "dataset2-top_k1-top_p0.5-temp0.5 (2).jsonl",
@@ -228,6 +221,29 @@ file_names = [
       "dataset7-top_k3-top_p0.5-temp0.5.jsonl",
 ]
 
+file_names = [
+      "dataset5-top_k2-top_p0.3-temp0.6.jsonl",
+      "dataset5-top_k2-top_p0.4-temp0.4.jsonl",
+      "dataset5-top_k2-top_p0.6-temp0.3.jsonl",
+      "dataset5-top_k4-top_p0.3-temp0.6.jsonl",
+      "dataset5-top_k4-top_p0.4-temp0.4.jsonl",
+      "dataset5-top_k4-top_p0.6-temp0.3.jsonl",
+]
+
+file_names = [
+      "dataset5-seed206-top_k3-top_p0.6-temp0.3.jsonl",
+      "dataset5-seed218-top_k3-top_p0.6-temp0.3.jsonl",
+      "dataset5-seed242-top_k3-top_p0.6-temp0.3.jsonl",
+      "dataset5-seed254-top_k3-top_p0.6-temp0.3.jsonl",
+]
+
+file_names = [
+      "dataset1-seed200-top_k3-top_p0.6-temp0.3.jsonl",
+      "dataset1-seed218-top_k3-top_p0.6-temp0.3.jsonl",
+      "dataset1-seed242-top_k3-top_p0.6-temp0.3.jsonl",
+      "dataset1-seed254-top_k3-top_p0.6-temp0.3.jsonl",
+]
+
 def compute_sim_tasks():
       for i, n in enumerate([1, 2, 3, 4, 5, 6, 7, 9, 10, 20, 21]):
 
@@ -247,15 +263,15 @@ def compute_sim_tasks():
 
 def compute_sim_task2():
       for i in file_names:
-            d1 = get_task_description(f"data/sim_tasks/diff_args/dataset1/precision/{i}", "task")
-            e1 = get_task_description(f"data/sim_tasks/diff_args/dataset1/precision/{i}")
-            e2 = get_task_description(f"data/sim_tasks/diff_args/dataset1/precision/{i}", "dataset_embedding")
+            d1 = get_task_description(f"data/sim_tasks/diff_duplicates/dataset1/{i}", "task")
+            e1 = get_task_description(f"data/sim_tasks/diff_duplicates/dataset1/{i}")
+            e2 = get_task_description(f"data/sim_tasks/diff_duplicates/dataset1/{i}", "dataset_embedding")
             compute_similarity_over_dataset(
                   dataset1=[[d] for d in d1],
                   dataset2=[[d1[0]]],
                   outputFileName=f"sim_over_tasks{i}.csv",
                   similarityFunction=similarityFunctions[2],
-                  location="data/sim_tasks/diff_args/dataset1/precision",
+                  location="data/sim_tasks/diff_duplicates/dataset1",
                   d2Embedding=[[Tensor(e)] for e in e1] if e1 else None, 
                   d1Embedding=[[Tensor(e)] for e in e2] if e2 else None,
             )
