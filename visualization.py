@@ -38,9 +38,10 @@ class Visualization:
                         numeric_df = numeric_df.round(0).astype(int)
 
                   n_rows, n_cols = numeric_df.shape
-                  cell_size = 1.0 
-                  figsize_x = max(10, n_cols * cell_size)
-                  figsize_y = max(10, n_rows * cell_size)
+                  cell_size_x = 1.0
+                  cell_size_y = 0.3
+                  figsize_x = max(10, n_cols * cell_size_x)
+                  figsize_y = max(10, n_rows * cell_size_y)
 
                   plt.figure(figsize=(figsize_x, figsize_y))
                   if self.file_path == 'data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv':
@@ -127,35 +128,29 @@ class Visualization:
             plt.savefig(f'{self.file_path}-{name}hist-repartition.png', dpi=300, bbox_inches='tight', transparent=False)
 
 
-vizualizer = [
-      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
-      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc1.csv', ascending=True),
-      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc2.csv', ascending=False),
-      Visualization('data/data/sim_dataset-prompt/jaccard_without_embeddings.csv', ascending=False)
-]
-# for viz in vizualizer:
+# vizualizer = [
+#       Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
+#       Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc1.csv', ascending=True),
+#       Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc2.csv', ascending=False),
+#       Visualization('data/data/sim_dataset-prompt/jaccard_without_embeddings.csv', ascending=False)
+# ]
+
+# for i, viz in enumerate(vizualizer):
 #       viz.load_data()
-#       viz.top_values('text-classification')
+#       # viz.heat_map()
+#       viz.get_repartition(simDistIndex=i)
+#       # viz.top_values('text-classification', n=5)
 
-# viz = Visualization('data/csv2/dataset0-similarityFunc0-prompt0.csv', ascending=True)
-# viz.load_data()
-# viz.hit_map()
-# viz.bar_chart_threshold(6.5)
+# vizualizer[0].load_data()
+# data=" ".join(["text categorization", "document classification", "content labeling", "topic identification"]),
+# vizualizer[0].zbar_chart_threshold(
+#       data=data,
+#       prompt4dataset=True
+# )
+# vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
 
-# print("ok")
-#       viz.heat_map()
+viz = Visualization('data/data/sim_tasks/similarity_over_tasks.csv', ascending=True)
+viz.load_data()
+viz.heat_map()
 
 
-for i, viz in enumerate(vizualizer):
-      viz.load_data()
-      # viz.heat_map()
-      viz.get_repartition(simDistIndex=i)
-      # viz.top_values('text-classification', n=5)
-
-vizualizer[0].load_data()
-data=" ".join(["text categorization", "document classification", "content labeling", "topic identification"]),
-vizualizer[0].zbar_chart_threshold(
-      data=data,
-      prompt4dataset=True
-)
-vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
