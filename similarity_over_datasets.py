@@ -222,15 +222,6 @@ file_names = [
 ]
 
 file_names = [
-      "dataset5-top_k2-top_p0.3-temp0.6.jsonl",
-      "dataset5-top_k2-top_p0.4-temp0.4.jsonl",
-      "dataset5-top_k2-top_p0.6-temp0.3.jsonl",
-      "dataset5-top_k4-top_p0.3-temp0.6.jsonl",
-      "dataset5-top_k4-top_p0.4-temp0.4.jsonl",
-      "dataset5-top_k4-top_p0.6-temp0.3.jsonl",
-]
-
-file_names = [
       "dataset5-seed206-top_k3-top_p0.6-temp0.3.jsonl",
       "dataset5-seed218-top_k3-top_p0.6-temp0.3.jsonl",
       "dataset5-seed242-top_k3-top_p0.6-temp0.3.jsonl",
@@ -242,6 +233,14 @@ file_names = [
       "dataset1-seed218-top_k3-top_p0.6-temp0.3.jsonl",
       "dataset1-seed242-top_k3-top_p0.6-temp0.3.jsonl",
       "dataset1-seed254-top_k3-top_p0.6-temp0.3.jsonl",
+]
+
+file_names = [
+      "dataset5-top_k2-top_p0.3-temp0.6.jsonl",
+      "dataset5-top_k2-top_p0.4-temp0.4.jsonl",
+      "dataset5-top_k2-top_p0.6-temp0.3.jsonl",
+      "dataset5-top_k4-top_p0.3-temp0.6.jsonl",
+      "dataset5-top_k4-top_p0.6-temp0.3.jsonl",
 ]
 
 def compute_sim_tasks():
