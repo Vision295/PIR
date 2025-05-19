@@ -188,7 +188,7 @@ def plot_best_values(vizList:list[Visualization], save_path:str, n:int=5):
             data,
             bins=2*n,
             stacked=True,
-            color=colors[:9],
+            color=colors[:4],
             label=keys,
       )
       plt.xlabel('Task')
@@ -233,7 +233,7 @@ def plot_best_args(vizList:list[Visualization], save_path:str, n:int=5):
             [[i] for i in map(lambda x: x[1], data)],
             bins=5*n,
             stacked=True,
-            color=colors[:9],
+            color=colors[:4],
             label=list(map(lambda x: x[0], data)),
       )
       plt.xlabel('Task')
@@ -292,13 +292,6 @@ vizualizer = [
 
 def compute_args_rating():
       file_list = [
-            "dataset1-top_k2-top_p0.3-temp0.6.jsonl",
-            "dataset1-top_k2-top_p0.6-temp0.3.jsonl",
-            "dataset1-top_k4-top_p0.3-temp0.6.jsonl",
-            "dataset1-top_k4-top_p0.4-temp0.4.jsonl",
-            "dataset1-top_k4-top_p0.6-temp0.3.jsonl",
-      ]
-      file_list = [
             "dataset1-top_k1-top_p0.5-temp0.5 (2).jsonl",
             "dataset1-top_k1-top_p0.5-temp0.5.jsonl",
             "dataset1-top_k2-top_p0.5-temp0.5 (2).jsonl",
@@ -326,7 +319,22 @@ def compute_args_rating():
             "dataset7-top_k3-top_p0.2-temp0.5.jsonl",
             "dataset7-top_k3-top_p0.5-temp0.5.jsonl",
       ]
-      vizList = [Visualization(f'data/sim_tasks/diff_args/dataset1/precision/sim_over_tasks{file}.csv', ascending=True) for file in file_list]
+      file_list = [
+            "dataset5-top_k2-top_p0.3-temp0.6.jsonl",
+            "dataset5-top_k2-top_p0.4-temp0.4.jsonl",
+            "dataset5-top_k2-top_p0.6-temp0.3.jsonl",
+            "dataset5-top_k4-top_p0.3-temp0.6.jsonl",
+            "dataset5-top_k4-top_p0.4-temp0.4.jsonl",
+            "dataset5-top_k4-top_p0.6-temp0.3.jsonl",
+      ]
+
+      file_list = [
+            "dataset1-seed200-top_k3-top_p0.6-temp0.3.jsonl",
+            "dataset1-seed218-top_k3-top_p0.6-temp0.3.jsonl",
+            "dataset1-seed242-top_k3-top_p0.6-temp0.3.jsonl",
+            "dataset1-seed254-top_k3-top_p0.6-temp0.3.jsonl",
+      ]
+      vizList = [Visualization(f'data/sim_tasks/diff_duplicates/dataset1/sim_over_tasks{file}.csv', ascending=True) for file in file_list]
       for viz in vizList : viz.load_data()
 
       best_res = get_best_tasks_args(vizList, average=True)
@@ -351,9 +359,9 @@ def compute_args_rating():
       print("\n------------------- SORTED VALUES -----------------\n")
       for v in highest_n:
             print(v[0], v[1])
-      plot_best_values(vizList, "data/sim_tasks/diff_args/dataset1/precision/hist_scores_visual_no_duplicates.png", n=9)
-      plot_best_values(vizList, "data/sim_tasks/diff_args/dataset1/precision/hq_hist_scores_visual_no_duplicates.png", n=35)
-      plot_best_args(vizList, "data/sim_tasks/diff_args/dataset1/precision/hist_mean_scores_visual_no_duplicates.png", n=25)
+      plot_best_values(vizList, "data/sim_tasks/diff_duplicates/dataset1/hist_scores_visual_no_duplicates.png", n=9)
+      plot_best_values(vizList, "data/sim_tasks/diff_duplicates/dataset1/hq_hist_scores_visual_no_duplicates.png", n=35)
+      plot_best_args(vizList, "data/sim_tasks/diff_duplicates/dataset1/hist_mean_scores_visual_no_duplicates.png", n=25)
 
 
       for i in best_res:
