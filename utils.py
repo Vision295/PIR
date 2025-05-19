@@ -15,6 +15,7 @@ import torch
 """
 csv_writer = list[dict[str, list[str]] | dict[str, list[float]]]
 
+
 similarityFunctions = [
       lambda x: pairwise_distance(x[0], x[1], p=0.5),
       lambda x: pairwise_distance(x[0], x[1], p=2),
