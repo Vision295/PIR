@@ -149,9 +149,13 @@ class Visualization:
 # )
 # vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
 
-# viz = Visualization('data/data/sim_tasks/similarity_over_tasks/d1/similarity_over_tasks.csv', ascending=True)
-viz = Visualization("data/data/sim_tasks/similarity_over_tasks/d1/clean_similarity_over_tasks.csv", ascending=True)
-viz.load_data()
-viz.heat_map()
+data = [Visualization('data/data/sim_tasks/similarity_over_tasks/d1/similarity_over_tasks.csv', ascending=True),
+       Visualization("data/data/sim_tasks/similarity_over_tasks/d1/clean_similarity_over_tasks.csv", ascending=True),
+       Visualization('data/data/sim_tasks/similarity_over_tasks/d5/similarity_over_tasks.csv', ascending=True),
+       Visualization("data/data/sim_tasks/similarity_over_tasks/d5/clean_similarity_over_tasks.csv", ascending=True)]
+
+for file in data:
+      file.load_data()
+      file.heat_map()
 
 
