@@ -175,7 +175,9 @@ cython_debug/
 
 
 data/
-visuals/
 data.zip
+visuals/
+visuals.zip
+
 xkbmap
 .vscode/
