@@ -191,15 +191,15 @@ file_names = [
       "dataset21-top_k4-top_p0.85-temp0.7.jsonl"
 ]
 
-for i, n in enumerate([1, 2, 3, 4, 5, 6, 7, 9, 10, 20, 21]):
 
-      d1 = get_dataset_description(f"data/data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories")
-      d2 = get_prompt_description(f"data/data/sim_dataset-prompt/prompts.json")
 
-      compute_similarity_over_dataset(
-            dataset1= d1,
-            dataset2= d2 ,
-            outputFileName="sim_over_tasks4.csv",
-            similarityFunction=similarityFunctions[3],
-            location=f"data/data/sim_tasks/{n}/",
-      )
+d1 = get_dataset_description(f"data/data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories")
+d2 = get_prompt_description(f"data/data/sim_dataset-prompt/prompts.json")
+
+compute_similarity_over_dataset(
+      dataset1= d1,
+      dataset2= d2 ,
+      outputFileName="dataset0-similarityFunc3.csv",
+      similarityFunction=similarityFunctions[3],
+      location=f"data/data/sim_dataset-prompt",
+)

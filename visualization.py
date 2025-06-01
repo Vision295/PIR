@@ -83,6 +83,7 @@ class Visualization:
             
             for i in self.promptsPerThreshold:
                   print(i)
+            print(self.promptsPerThreshold)
                   
 
       def bar_chart_threshold(self, value):
@@ -212,6 +213,90 @@ class Visualization:
               print(f"Tableau des {n} plus petits prompts par colonne sauvegardé dans {output_file}.")
           else:
               print("Données non chargées.")
+      
+      def bar_chart_per_task(self, value):
+          if self.df is not None:
+              numeric_df = self.df.select_dtypes(include='number')
+              if numeric_df.empty:
+                  print("Aucune colonne numérique à afficher.")
+                  return
+      
+              # Filtrer les colonnes pour les valeurs inférieures au seuil
+              filtered_df = numeric_df[numeric_df < value].dropna(axis=1, how='all')
+      
+              if filtered_df.empty:
+                  print(f"Aucune valeur inférieure au seuil {value}.")
+                  return
+      
+              # Générer un graphique par colonne (tâche)
+              for column in filtered_df.columns:
+                  plt.figure(figsize=(10, 6))
+                  bars = plt.barh(filtered_df.index, filtered_df[column], color='skyblue')
+                  plt.title(f"Bar chart for task: {column} (Threshold: {value})")
+                  plt.xlabel('Scores')
+      
+                  # Ajouter les prompts directement sur les barres
+                  for bar, prompt in zip(bars, filtered_df.index):
+                      plt.text(bar.get_width(), bar.get_y() + bar.get_height() / 2, str(prompt), 
+                               va='center', ha='left', fontsize=8)
+      
+                  plt.tight_layout()
+                  filename = f'barchart_{column}_simple.png'
+                  plt.savefig(filename, transparent=False)
+                  print(f"Bar chart saved to {filename}")
+                  plt.close()
+          else:
+              print("Données non chargées.")
+
+      def annotated_horizontal_chart(self, value):
+
+            if self.df is not None:
+                  numeric_df = self.df.select_dtypes(include='number')
+                  if numeric_df.empty:
+                        print("Aucune colonne numérique à afficher.")
+                        return
+
+                  # Filtrer les colonnes pour les valeurs inférieures au seuil
+                  filtered_df = numeric_df[numeric_df < value].dropna(axis=1, how='all')
+
+                  if filtered_df.empty:
+                        print(f"Aucune valeur inférieure au seuil {value}.")
+                        return
+
+                  # Générer un graphique horizontal par colonne (tâche)
+                  for column in filtered_df.columns:
+                        plt.figure(figsize=(10, 3))
+
+                        # Préparer les données
+                        x_values = filtered_df[column].dropna()
+                        y_values = [1] * len(x_values)  # tous à la même hauteur
+                        labels = x_values.index  # les index comme descriptions
+
+                        # Tracer les points
+                        plt.scatter(x_values, y_values, color='steelblue', s=100, zorder=2)
+
+                        # Annoter chaque point
+                        for x, label in zip(x_values, labels):
+                              plt.text(x, 1.05, str(label), ha='center', va='bottom', fontsize=9)
+
+                        # Ligne horizontale pour la "timeline"
+                        plt.axhline(1, color='gray', linestyle='--', linewidth=1)
+
+                        # Personnalisation
+                        plt.yticks([])
+                        plt.xlabel('Value')
+                        plt.title(f"Horizontal Annotated Chart for Task: {column} (Threshold: {value})")
+                        plt.tight_layout()
+
+                        # Sauvegarde
+                        filename = f'annotated_horizontal_chart_{column}.png'
+                        plt.savefig(filename, transparent=False)
+                        print(f"Horizontal Annotated Chart saved to {filename}")
+                        plt.close()
+            else:
+                  print("Données non chargées.")
+
+
 
 vizualizer = [
       Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
@@ -220,6 +305,9 @@ vizualizer = [
       Visualization('data/data/sim_dataset-prompt/jaccard_without_embeddings.csv', ascending=False),
       Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc3.csv', ascending=True)
 ]
+
+
+
 # for viz in vizualizer:
 #       viz.load_data()
 #       viz.top_values('text-classification')
@@ -229,9 +317,9 @@ viz.load_data()
 viz.bar_chart_threshold(0.01) """
 
 
-for i in vizualizer:
+""" for i in vizualizer:
      i.load_data()
-     i.save_bottom_prompts_as_png(n=3, output_file=f"bottom_prompts_table_func{i.file_path[-5]}.png")
+     i.save_bottom_prompts_as_png(n=3, output_file=f"bottom_prompts_table_func{i.file_path[-5]}.png") """
 
 
 """ viz = Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc3.csv', ascending=True)
@@ -244,7 +332,7 @@ viz.save_bottom_prompts_as_png(n=3, output_file="bottom_prompts_table_func3.png"
 #       viz.heat_map()
 
 
-for i, viz in enumerate(vizualizer):
+""" for i, viz in enumerate(vizualizer):
       viz.load_data()
       # viz.heat_map()
       viz.get_repartition(simDistIndex=i)
@@ -256,4 +344,16 @@ vizualizer[0].zbar_chart_threshold(
       data=data,
       prompt4dataset=True
 )
-vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
+vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset") """
+
+viz = Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True)
+viz.load_data()
+viz.zbar_chart_threshold("text-classification text2text-generation text-generation", prompt4dataset=False)
+
+
+""" viz = Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True)
+viz.load_data()
+viz.annotated_horizontal_chart(value=35000) """
+
+
+
