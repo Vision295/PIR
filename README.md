@@ -5,6 +5,29 @@ Est commenté et mentionné par """used to ... """ chaque fonction générant de
 Toutes les raws data (datasets et calculs de similarités) sont dans le dossier data/
 Toutes les visualisations et graphes pour visualiser les données sont dans le dossier visuals/
 
+LES FICHIERS :
+
+hugging_face_transformer_test.py 
+    inchangé
+
+file_manager.py 
+    edit et transform des formats dict au format .csv 
+
+prompt_converter.py
+    copie de hugging_face_transformer_test.py avec quelques modif pour pouvoir prendre autant d'inputs que voulu 
+        (list[str] -> list[tokenized] -> list[embeddings])
+        et a la possibilité de faire .compute_similarity(function)
+
+similarity_over_dataset.py 
+    prends les datasets et les prompts et applique les différentes mesures de similaritées sur les différents prompts et sur les différents datasets 
+        (utilisant tous les auters fichiers)
+
+visualization.py
+    permets de générer les fichiers dans visuals/ à partir de data/ (heatmap, repartition, histogrammes, ... )
+
+utils.py
+    des paramètres fix stockées ici pour être réutilisés dans chaque fichier
+
 data
 ├── csv2
 │   ├── dataset0-similarityFunc0-prompt0.csv
