@@ -23,9 +23,6 @@ similarityFunctions = [
       lambda x: jaccard_index_for_embeddings(x[0], x[1]),
 ]
 
-repartitionThresholds = [
-      [30000, 32500, 35000, 37500],
-]
 
 def jaccard_index_for_embeddings(embedding1:torch.Tensor, embedding2:torch.Tensor, threshold:float=0.5) -> torch.Tensor:
       """
@@ -55,6 +52,73 @@ def remove_duplicates(inputFile:str = "datasetdetails.jsonl", outputFile:str= "d
 
 
 #remove_duplicates("datasetdetails.jsonl")
+
+
+
+file_names = {
+
+      1:[ 
+            "dataset2-top_k1-top_p0.5-temp0.5 (2).jsonl",
+            "dataset2-top_k1-top_p0.5-temp0.5.jsonl",
+            "dataset2-top_k2-top_p0.5-temp0.5 (2).jsonl",
+            "dataset2-top_k2-top_p0.5-temp0.5.jsonl",
+            "dataset2-top_k3-top_p0.5-temp0.5 (2).jsonl",
+            "dataset2-top_k3-top_p0.5-temp0.5.jsonl",
+      ],
+
+      2:[
+            "dataset2-top_k3-top_p0.2-temp0.5 (2).jsonl",
+            "dataset2-top_k3-top_p0.2-temp0.5.jsonl",
+            "dataset2-top_k3-top_p0.5-temp0.5 (2).jsonl",
+            "dataset2-top_k3-top_p0.5-temp0.5.jsonl",
+            "dataset2-top_k3-top_p0.9-temp0.5 (2).jsonl",
+            "dataset2-top_k3-top_p0.9-temp0.5.jsonl",
+      ],
+
+      3:[
+            "dataset5-top_k2-top_p0.5-temp0.2 (2).jsonl",
+            "dataset5-top_k2-top_p0.5-temp0.2.jsonl",
+            "dataset5-top_k2-top_p0.5-temp0.5 (2).jsonl",
+            "dataset5-top_k2-top_p0.5-temp0.5.jsonl",
+            "dataset5-top_k2-top_p0.5-temp0.9 (2).jsonl",
+            "dataset5-top_k2-top_p0.5-temp0.9.jsonl",
+      ],
+
+      4:[
+            "dataset1-top_k2-top_p0.3-temp0.6.jsonl",
+            "dataset1-top_k2-top_p0.4-temp0.4.jsonl",
+            "dataset1-top_k2-top_p0.6-temp0.3.jsonl",
+            "dataset1-top_k4-top_p0.3-temp0.6.jsonl",
+            "dataset1-top_k4-top_p0.4-temp0.4.jsonl",
+            "dataset1-top_k4-top_p0.6-temp0.3.jsonl",
+            "dataset7-top_k2-top_p0.5-temp0.2.jsonl",
+            "dataset7-top_k3-top_p0.2-temp0.5.jsonl",
+            "dataset7-top_k3-top_p0.5-temp0.5.jsonl",
+      ],
+
+      5:[
+            "dataset5-seed206-top_k3-top_p0.6-temp0.3.jsonl",
+            "dataset5-seed218-top_k3-top_p0.6-temp0.3.jsonl",
+            "dataset5-seed242-top_k3-top_p0.6-temp0.3.jsonl",
+            "dataset5-seed254-top_k3-top_p0.6-temp0.3.jsonl",
+      ],
+
+      6:[
+            "dataset1-seed200-top_k3-top_p0.6-temp0.3.jsonl",
+            "dataset1-seed218-top_k3-top_p0.6-temp0.3.jsonl",
+            "dataset1-seed242-top_k3-top_p0.6-temp0.3.jsonl",
+            "dataset1-seed254-top_k3-top_p0.6-temp0.3.jsonl",
+      ],
+
+      7:[
+            "dataset5-top_k2-top_p0.3-temp0.6.jsonl",
+            "dataset5-top_k2-top_p0.4-temp0.4.jsonl",
+            "dataset5-top_k2-top_p0.6-temp0.3.jsonl",
+            "dataset5-top_k4-top_p0.3-temp0.6.jsonl",
+            "dataset5-top_k4-top_p0.6-temp0.3.jsonl",
+      ],
+}
+
 
 def get_name_from_path(path:str) -> str:
       """

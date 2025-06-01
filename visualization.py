@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from regex import W
 import seaborn as sns
 import textwrap
-from utils import repartitionThresholds, get_name_from_path
+from utils import get_name_from_path, file_names
 
 class Visualization:
       def __init__(self, file_path, ascending=True):
@@ -26,6 +26,7 @@ class Visualization:
             return ['\n'.join(textwrap.wrap(label, width)) for label in labels]
 
       def heat_map(self):
+            """used to generate the visuals/sim_dataset-prompt/*heatmap.png"""
             if self.df is not None:
                   numeric_df = self.df.select_dtypes(include='number')
 
@@ -57,34 +58,8 @@ class Visualization:
             else:
                   print("Pas de donnees")
 
-
-      def zbar_chart_threshold(
-                  self, 
-                  data:str="text-classification text2text-generation text-generation",
-                  prompt4dataset:bool=False,
-            ):
-
-            if prompt4dataset:
-                  """given a prompt we plot the different thresholds for the dataset"""
-                  values = self.df.loc[data].to_dict()
-            else:
-                  """given a dataset we plot different thresholds for the prompts"""
-                  # Convert the DataFrame to a dictionary with descriptions as keys and scores as values
-                  values = self.df[data].to_dict()
-
-            repartitionThreshold = repartitionThresholds[int(self.file_path[-5])]
-            self.promptsPerThreshold = {}
-            for i in repartitionThreshold:
-                  self.promptsPerThreshold[i] = list(dict(filter(
-                              lambda item: item[1] <= i,
-                              values.items()
-                  )).keys())
-            
-            for i in self.promptsPerThreshold:
-                  print(i)
-                  
-
       def bar_chart_threshold(self, value):
+            """used to generate : visuals/sim_dataset-prompt/barchart.png"""
             if self.df is not None:
                   numeric_df = self.df.select_dtypes(include='number')
                   # seuil
@@ -104,6 +79,7 @@ class Visualization:
       
             
       def get_repartition(self, otherData:dict | None=None, nbins:int=90, simDistIndex=0, name:str=""):
+            """used to generate : visuals/sim_dataset-prompt/hist-repartition.png"""
             if otherData is not None:
                   all_values = otherData.values()
             else:
@@ -152,6 +128,7 @@ def get_n_highest_task_values(vizList:list[Visualization]) -> list[tuple]:
       return results
 
 def get_best_tasks_args(vizList:list[Visualization], average:bool=True) -> list[tuple]:
+      """used to get the top (ordered list from dict) of the best values of similarity"""
       scores = {}
       for viz in vizList:
             viz.load_data()
@@ -160,9 +137,7 @@ def get_best_tasks_args(vizList:list[Visualization], average:bool=True) -> list[
       return sorted_scores
 
 def plot_best_values(vizList:list[Visualization], save_path:str, n:int=5):
-      """
-      Plot the best arguments for a specific task across multiple visualizations.
-      """
+      """used to create the visuals/sim_tasks/*/*/hist_mean*.png"""
       for viz in vizList : viz.load_data()
       keys = [get_name_from_path(viz.file_path) for viz in vizList]
       data = []
@@ -199,10 +174,9 @@ def plot_best_values(vizList:list[Visualization], save_path:str, n:int=5):
       plt.tight_layout()
       plt.savefig(save_path, dpi=600)
       plt.show()
+
 def plot_best_args(vizList:list[Visualization], save_path:str, n:int=5):
-      """
-      Plot the best arguments for a specific task across multiple visualizations.
-      """
+      """used to create the files visuals/sim_tasks/diff_args/*/hist_score*.png"""
       data = get_best_tasks_args(vizList)[:n]
       keys = [get_name_from_path(viz.file_path) if get_name_from_path(viz.file_path) in list(map(lambda x: x[0], data)) else None for viz in vizList]
 
@@ -245,17 +219,6 @@ def plot_best_args(vizList:list[Visualization], save_path:str, n:int=5):
       plt.savefig(save_path, dpi=600)
       plt.show()
 
-def get_duplicates_similarity(vizList:list[Visualization]) -> list[tuple]:
-      """
-      Get the duplicates similarity across multiple visualizations.
-      """
-      duplicates = []
-      for viz in vizList:
-            viz.load_data()
-            for i, row in viz.df.iterrows():
-                  if row['text-classification'] > 0.9:  # Assuming a threshold of 0.9 for similarity
-                        duplicates.append((i, row['text-classification']))
-      return duplicates
 
 vizualizer = [
       Visualization('data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
@@ -263,77 +226,10 @@ vizualizer = [
       Visualization('data/sim_dataset-prompt/dataset0-similarityFunc2.csv', ascending=False),
       Visualization('data/sim_dataset-prompt/jaccard_without_embeddings.csv', ascending=False)
 ]
-# for viz in vizualizer:
-#       viz.load_data()
-#       viz.top_values('text-classification')
 
-# viz = Visualization('data/csv2/dataset0-similarityFunc0-prompt0.csv', ascending=True)
-# viz.load_data()
-# viz.hit_map()
-# viz.bar_chart_threshold(6.5)
-
-# print("ok")
-#       viz.heat_map()
-
-
-# for i, viz in enumerate(vizualizer):
-#       viz.load_data()
-      # viz.heat_map()
-      # viz.get_repartition(simDistIndex=i)
-      # viz.top_values('text-classification', n=5)
-
-# vizualizer[0].load_data()
-# data=" ".join(["text categorization", "document classification", "content labeling", "topic identification"]),
-# vizualizer[0].zbar_chart_threshold(
-#       data=data,
-#       prompt4dataset=True
-# )
-# vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
-
-def compute_args_rating():
-      file_list = [
-            "dataset1-top_k1-top_p0.5-temp0.5 (2).jsonl",
-            "dataset1-top_k1-top_p0.5-temp0.5.jsonl",
-            "dataset1-top_k2-top_p0.5-temp0.5 (2).jsonl",
-            "dataset1-top_k2-top_p0.5-temp0.5.jsonl",
-            "dataset1-top_k3-top_p0.5-temp0.5 (2).jsonl",
-            "dataset1-top_k3-top_p0.5-temp0.5.jsonl",
-      ]
-      file_list = [
-            "dataset2-top_k3-top_p0.2-temp0.5 (2).jsonl",
-            "dataset2-top_k3-top_p0.2-temp0.5.jsonl",
-            "dataset2-top_k3-top_p0.5-temp0.5 (2).jsonl",
-            "dataset2-top_k3-top_p0.5-temp0.5.jsonl",
-            "dataset2-top_k3-top_p0.9-temp0.5 (2).jsonl",
-            "dataset2-top_k3-top_p0.9-temp0.5.jsonl",
-      ]
-
-      file_list = [
-            "dataset1-top_k2-top_p0.3-temp0.6.jsonl",
-            "dataset1-top_k2-top_p0.4-temp0.4.jsonl",
-            "dataset1-top_k2-top_p0.6-temp0.3.jsonl",
-            "dataset1-top_k4-top_p0.3-temp0.6.jsonl",
-            "dataset1-top_k4-top_p0.4-temp0.4.jsonl",
-            "dataset1-top_k4-top_p0.6-temp0.3.jsonl",
-            "dataset7-top_k2-top_p0.5-temp0.2.jsonl",
-            "dataset7-top_k3-top_p0.2-temp0.5.jsonl",
-            "dataset7-top_k3-top_p0.5-temp0.5.jsonl",
-      ]
-
-      file_list = [
-            "dataset1-seed200-top_k3-top_p0.6-temp0.3.jsonl",
-            "dataset1-seed218-top_k3-top_p0.6-temp0.3.jsonl",
-            "dataset1-seed242-top_k3-top_p0.6-temp0.3.jsonl",
-            "dataset1-seed254-top_k3-top_p0.6-temp0.3.jsonl",
-      ]
-
-      file_list = [
-            "dataset5-top_k2-top_p0.3-temp0.6.jsonl",
-            "dataset5-top_k2-top_p0.6-temp0.3.jsonl",
-            "dataset5-top_k4-top_p0.4-temp0.4.jsonl",
-            "dataset5-top_k4-top_p0.3-temp0.6.jsonl",
-            "dataset5-top_k4-top_p0.6-temp0.3.jsonl",
-      ]
+def compute_args_rating(a:int):
+      """used to generate : visuals/sim_tasks/*/.../results.txt"""
+      file_list = file_names[a]
       vizList = [Visualization(f'data/sim_tasks/diff_args/dataset5/sim_over_tasks{file}.csv', ascending=True) for file in file_list]
       for viz in vizList : viz.load_data()
 
@@ -368,7 +264,7 @@ def compute_args_rating():
             print(i[0], i[1])
       
 
-compute_args_rating()
+compute_args_rating(7)
 
 # viz = Visualization('data/sim_tasks/task_selection/similarity_over_tasks.csv', ascending=True)
 # viz.load_data()
