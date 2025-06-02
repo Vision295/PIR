@@ -12,7 +12,7 @@ class PromptConverter:
 
       def tokenize(self):
             self.tokenizedInputs = list(map(
-                  lambda x: self.tokenizer(x, return_tensors="pt", truncation=False),
+                  lambda x: self.tokenizer(x, return_tensors="pt", truncation=True, padding=True),
                   self.inputs
             ))
       

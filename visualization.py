@@ -37,8 +37,19 @@ class Visualization:
                   if self.file_path == 'data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv':
                         numeric_df = numeric_df.round(0).astype(int)
 
+                  # Nettoyer les descriptions des lignes (index)
+                  def clean_description(desc, max_len=60):
+                        desc = str(desc)
+                        if desc.startswith("Task "):
+                              desc = desc.split(". ", 1)[-1]  # Supprimer "Task X. "
+                        return desc[:max_len] + "..." if len(desc) > max_len else desc
+
+                  # Appliquer le nettoyage à l'index (lignes uniquement)
+                  numeric_df.index = [clean_description(d) for d in numeric_df.index]
+
+
                   n_rows, n_cols = numeric_df.shape
-                  cell_size_x = 1.0
+                  cell_size_x = 1
                   cell_size_y = 0.3
                   figsize_x = max(10, n_cols * cell_size_x)
                   figsize_y = max(10, n_rows * cell_size_y)
@@ -48,6 +59,8 @@ class Visualization:
                         sns.heatmap(numeric_df, annot=True, cmap='viridis', fmt="d", annot_kws={"size": 8})
                   else:
                         sns.heatmap(numeric_df, annot=True, cmap='viridis', fmt=".2f", annot_kws={"size": 8})
+
+                  plt.xticks([])
 
                   plt.title("Heatmap", fontsize=16)
                   plt.tight_layout()
@@ -149,10 +162,11 @@ class Visualization:
 # )
 # vizualizer[0].get_repartition(vizualizer[0].df.loc[data].to_dict(), nbins=10, simDistIndex=0, name="prompt4dataset")
 
-data = [Visualization('data/data/sim_tasks/similarity_over_tasks/d1/similarity_over_tasks.csv', ascending=True),
-       Visualization("data/data/sim_tasks/similarity_over_tasks/d1/clean_similarity_over_tasks.csv", ascending=True),
-       Visualization('data/data/sim_tasks/similarity_over_tasks/d5/similarity_over_tasks.csv', ascending=True),
-       Visualization("data/data/sim_tasks/similarity_over_tasks/d5/clean_similarity_over_tasks.csv", ascending=True)]
+data = [Visualization('data/data/sim_tasks/similarity_over_tasks/d1/datasets_and_tasks.csv', ascending=True)]
+      # Visualization('data/data/sim_tasks/similarity_over_tasks/d1/similarity_over_tasks.csv', ascending=True),
+#        Visualization("data/data/sim_tasks/similarity_over_tasks/d1/clean_similarity_over_tasks.csv", ascending=True)]
+      #  Visualization('data/data/sim_tasks/similarity_over_tasks/d5/similarity_over_tasks.csv', ascending=True),
+      #  Visualization("data/data/sim_tasks/similarity_over_tasks/d5/clean_similarity_over_tasks.csv", ascending=True)]
 
 for file in data:
       file.load_data()
