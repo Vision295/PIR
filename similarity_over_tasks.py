@@ -8,45 +8,44 @@ from file_manager import FileManager
 from math import fabs
 
 def compute_similarity_over_tasks(
-            dataset1:list[list[str]], 
-            dataset2:list[list[str]], 
+            data1:list[list[str]], 
+            data2:list[list[str]], 
             outputFileName:str, 
             similarityFunction, 
-            location:str="csv",
-            d1Embedding:list[float] | None=None,
-            d2Embedding:list[float] | None=None,
+            location:str="csv"
       ) -> csv_writer:
-      
-      csvManager = FileManager()
+      """
+      Computes the similarity between two lists of task descriptions and writes the results to a CSV file.
 
-      size1 = len(dataset1)
-      dataset1 = [item[0] if isinstance(item, list) else item for item in dataset1]
-      size1 = len(dataset1)
+      This function is very similar to `compute_similarity_over_dataset()` but adapted to compare *tasks*.
+
+      Args:
+            data1 : List of task descriptions to compare from.
+            data2 : List of task descriptions to compare to.
+            similarityFunction : Function used to compute similarity (cosine in this case for the tasks).
+
+      Returns:
+            csv_writer: A CSV data structure containing similarity values.
+      """   
+      csvManager = FileManager()
+      size1 = len(data1)
+
+      # Flatten inner lists if needed
+      data1 = [item[0] if isinstance(item, list) else item for item in data1]
+      size1 = len(data1)
+      
       # Initialize the similarity dictionary
-      similarityDict = [{v: [0.0 for _ in range(size1)]} if i != 0 else {"description": [j for j in dataset1]} for i, v in enumerate([""] + dataset2)]
-      for i, v in enumerate([[""]] + dataset2):
-            print("step :", i, "out of :", len(dataset2), "steps")
-            for j, w in enumerate(dataset1):
+      similarityDict = [{v: [0.0 for _ in range(size1)]} if i != 0 else {"description": [j for j in data1]} 
+                        for i, v in enumerate([""] + data2)]
+      for i, v in enumerate([[""]] + data2):
+            print("step :", i, "out of :", len(data2), "steps")
+            for j, w in enumerate(data1):
                   # i == 0 is the description in w, w = {"description" : ["desc_1", "desc_2", ...]}
                   if i != 0:
-                        if d1Embedding is None and d2Embedding is None:
-                              promptConverter = PromptConverter(v, w)
-                              promptConverter.generate_embeddings()
-                        elif d1Embedding is None and d2Embedding is not None:
-                              promptConverter = PromptConverter(v)
-                              promptConverter.generate_embeddings()
-                              promptConverter.embeddings.append(d2Embedding[j])
-                        elif d1Embedding is not None and d2Embedding is None:
-                              promptConverter = PromptConverter(w)
-                              promptConverter.generate_embeddings()
-                              promptConverter.embeddings.append(d1Embedding[i - 1])
-                        else:
-                              promptConverter = PromptConverter("ok", "ok")
-                              print(type(d2Embedding), type(d2Embedding) is None)
-                              promptConverter.embeddings = [d1Embedding[i - 1], d2Embedding[j]]
-                        promptConverter.compute_similarity(similarityFunction)
-                        # stores the similarity value in : {"desc_i": [X, X, X, ..., Y, X, X, ...]} 
-                        # changes Y where Y is the jth element and desc_i is the ith description
+                        promptConverter = PromptConverter(v, w)
+                        promptConverter.generate_embeddings()
+                        promptConverter.compute_similarity(similarityFunction)                        
+                        # Get absolute similarity value
                         similarity:float = fabs(promptConverter.similarities[0].item())
                         similarityDict[i][v][j] = similarity # type: ignore
                         
@@ -56,6 +55,16 @@ def compute_similarity_over_tasks(
 
 
 def find_high_values(csv_file, threshold=0.85):
+      """
+      Finds indices of tasks in a CSV file that are too similar (with score above a threshold).
+
+      Args:
+            csv_file : Path to the CSV file with similarity scores.
+            threshold : Threshold above which values are considered "too similar".
+
+      Returns:
+            list of int: List of row indices to remove due to high similarity.
+      """
       high_value_positions = []
 
       with open(csv_file, "r", encoding="utf-8") as file:
@@ -78,6 +87,14 @@ def find_high_values(csv_file, threshold=0.85):
       return index
 
 def clean_tasks_csv(old_csv, new_path, index):
+      """
+      Removes rows and columns corresponding to high similarity values from the CSV.
+
+      Args:
+            old_csv : Path to the original CSV file.
+            new_path : Path to save the cleaned CSV file.
+            index : List of row/column indices to remove.
+      """
       path = new_path
       clean_line = []
       with open(old_csv, "r", encoding="utf-8") as file:
@@ -95,24 +112,30 @@ def clean_tasks_csv(old_csv, new_path, index):
 
 
 if __name__ == '__main__':
+# Example usage below:
+
+### To generate similarity_over_tasks.csv file :
       # folders = ["d1","d5"]
       # for d in folders:
-
-###     Pour generer similarity_over_tasks.csv
             # tasks_file = f"data/data/sim_tasks/similarity_over_tasks/{d}/merged_tasks_{d}.jsonl"
             # output_folder = f"data/data/sim_tasks/similarity_over_tasks/{d}/"
             # tasks = get_task_description(tasks_file, "task")
-            # compute_similarity_over_tasks(dataset1=tasks,
-            #                               dataset2=tasks,
+            # compute_similarity_over_tasks(data1=tasks,
+            #                               data2=tasks,
             #                               outputFileName="similarity_over_tasks.csv",
             #                               similarityFunction=similarityFunctions[2],
             #                               location=output_folder)
 
-###     Pour generer clean_similarity_over_tasks.csv
+### To generate clean_similarity_over_tasks.csv file : 
+      # folders = ["d1","d5"]
+      # for d in folders:
+            # index = find_high_values(f"data/data/sim_tasks/similarity_over_tasks/{d}/similarity_over_tasks.csv")
+            # clean_tasks_csv(f"data/data/sim_tasks/similarity_over_tasks/{d}/similarity_over_tasks.csv",
+            #                   f"data/data/sim_tasks/similarity_over_tasks/{d}/clean_similarity_over_tasks.csv",
+            #                   index)
+
+### To compare the tasks generated for dataset1 with all the datasets
       index = find_high_values(f"data/data/sim_tasks/similarity_over_tasks/d1/similarity_over_tasks.csv")
-      # clean_tasks_csv(f"data/data/sim_tasks/similarity_over_tasks/{d}/similarity_over_tasks.csv",
-      #                   f"data/data/sim_tasks/similarity_over_tasks/{d}/clean_similarity_over_tasks.csv",
-      #                   index)
       tasks = get_task_description("data/data/sim_tasks/similarity_over_tasks/d1/merged_tasks_d1.jsonl", "task")
       
       # Sort the indices in descending order
@@ -123,8 +146,8 @@ if __name__ == '__main__':
                   print(f"Index {i - 1} is out of range")
       
       data = get_dataset_description("data/data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories")
-      compute_similarity_over_tasks(dataset1=data,
-                                    dataset2=tasks,
+      compute_similarity_over_tasks(data1=data,
+                                    data2=tasks,
                                     outputFileName="datasets_and_tasks.csv",
                                     similarityFunction=similarityFunctions[2],
                                     location="data/data/sim_tasks/similarity_over_tasks/d1/")

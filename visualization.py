@@ -9,10 +9,21 @@ class Visualization:
             self.ascending = ascending
 
       def load_data(self):
+            """
+            Loads the CSV file into a pandas DataFrame.
+            Assumes the first column is the index.
+            """
             self.df = pd.read_csv(self.file_path, index_col=0)
             # print(self.df.head())
 
       def top_values(self, column_name, n=5):
+            """
+            Prints the top N rows from the DataFrame based on the specified column.
+
+            Args:
+                  column_name (str): The column used for sorting.
+                  n (int): Number of top rows to display. Defaults to 5.
+            """
             if self.df is not None:
                   top = self.df.sort_values('text-classification', ascending=self.ascending).head(n)
                   print(self.file_path)
@@ -22,6 +33,13 @@ class Visualization:
 
 
       def heat_map(self):
+            """
+            Generates and saves a heatmap of the data in the CSV file.
+            - Skips non-numeric columns (descriptions).
+            - Cleans up row labels to make the heatmap more readable.
+            - Adjusts figure size based on number of rows/columns.
+            - Saves the heatmap to a PNG file in the same folder as the CSV.
+            """
             if self.df is not None:
                   numeric_df = self.df.select_dtypes(include='number')
 
@@ -32,17 +50,16 @@ class Visualization:
                   if self.file_path == 'data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv':
                         numeric_df = numeric_df.round(0).astype(int)
 
-                  # Nettoyer les descriptions des lignes (index)
+                  # Clean the row descriptions
                   def clean_description(desc, max_len=60):
                         desc = str(desc)
                         if desc.startswith("Task "):
-                              desc = desc.split(". ", 1)[-1]  # Supprimer "Task X. "
+                              desc = desc.split(". ", 1)[-1]  # Delete "Task X. " from the str
                         return desc[:max_len] + "..." if len(desc) > max_len else desc
 
-                  # Appliquer le nettoyage à l'index (lignes uniquement)
                   numeric_df.index = [clean_description(d) for d in numeric_df.index]
 
-
+                  # Dynamically size the heatmap based on content
                   n_rows, n_cols = numeric_df.shape
                   cell_size_x = 1
                   cell_size_y = 0.3
@@ -55,7 +72,7 @@ class Visualization:
                   else:
                         sns.heatmap(numeric_df, annot=True, cmap='viridis', fmt=".2f", annot_kws={"size": 8})
 
-                  plt.xticks([])
+                  plt.xticks([]) # Optional: hides x-axis labels if they’re messy
 
                   plt.title("Heatmap", fontsize=16)
                   plt.tight_layout()
@@ -68,6 +85,7 @@ class Visualization:
                   print("Pas de donnees")
 
 if __name__ == '__main__':
+      # Create Visualization instances for each CSV file
 
       data = [Visualization('data/data/sim_tasks/similarity_over_tasks/d1/datasets_and_tasks.csv', ascending=True),
               Visualization('data/data/sim_tasks/similarity_over_tasks/d5/datasets_and_tasks.csv', ascending=True)]
