@@ -13,9 +13,7 @@ class Visualization:
 
       def load_data(self):
             self.df = pd.read_csv(self.file_path, index_col=0)
-            self.df.columns = self.df.columns.str.replace(r"[^\w\s]", "", regex=True)
-            self.df.index = self.df.index.str.replace(r"[^\w\s]", "", regex=True)
-   
+            # print(self.df.head())
 
       def top_values(self, column_name, n=5):
             if self.df is not None:
@@ -128,27 +126,31 @@ class Visualization:
             plt.tight_layout()
             plt.savefig(f'{self.file_path}-{name}hist-repartition.png', dpi=300, bbox_inches='tight', transparent=False)
 
-#à adapter selon les fichiers voulus à visualiser
+
 vizualizer = [
-      Visualization('data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
-      Visualization('data/sim_dataset-prompt/dataset0-similarityFunc1.csv', ascending=True),
-      Visualization('data/sim_dataset-prompt/dataset0-similarityFunc2.csv', ascending=False),
-      Visualization('data/sim_dataset-prompt/jaccard_prompt_to_prompt_no_doublons.csv', ascending=False),
-      Visualization('data/sim_dataset-prompt/jaccard_task_category_to_prompt.csv', ascending=False)
+      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc0.csv', ascending=True),
+      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc1.csv', ascending=True),
+      Visualization('data/data/sim_dataset-prompt/dataset0-similarityFunc2.csv', ascending=False),
+      Visualization('data/data/sim_dataset-prompt/jaccard_without_embeddings.csv', ascending=False)
 ]
+# for viz in vizualizer:
+#       viz.load_data()
+#       viz.top_values('text-classification')
+
+# viz = Visualization('data/csv2/dataset0-similarityFunc0-prompt0.csv', ascending=True)
+# viz.load_data()
+# viz.hit_map()
+# viz.bar_chart_threshold(6.5)
+
+# print("ok")
+#       viz.heat_map()
 
 
 for i, viz in enumerate(vizualizer):
       viz.load_data()
-      viz.heat_map()
+      # viz.heat_map()
       viz.get_repartition(simDistIndex=i)
       # viz.top_values('text-classification', n=5)
-
-for i, n in enumerate([1, 2, 3, 4, 5, 6, 7, 9, 10, 20, 21]):
-      viz = Visualization(f"data/sim_tasks/{n}/jaccard_index.csv", ascending=False)
-      viz.load_data()
-      viz.heat_map()
-      viz.get_repartition(simDistIndex=i)
 
 vizualizer[0].load_data()
 data=" ".join(["text categorization", "document classification", "content labeling", "topic identification"]),

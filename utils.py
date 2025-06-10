@@ -18,7 +18,8 @@ csv_writer = list[dict[str, list[str]] | dict[str, list[float]]]
 similarityFunctions = [
       lambda x: pairwise_distance(x[0], x[1], p=0.5),
       lambda x: pairwise_distance(x[0], x[1], p=2),
-      lambda x: (1 - cosine_similarity(x[0], x[1], dim=0)) / 2
+      lambda x: cosine_similarity(x[0], x[1], dim=0),
+      lambda x: jaccard_index_for_embeddings(x[0], x[1]),
 ]
 
 repartitionThresholds = [
@@ -55,18 +56,18 @@ def remove_duplicates(inputFile:str = "datasetdetails.jsonl", outputFile:str= "d
 #remove_duplicates("datasetdetails.jsonl")
 
 
-# print(
-#       cosine_similarity(
-#             Tensor([1.0, 2.0]),
-#             Tensor([2.0, 3.0]),
-#             dim=0
-#       )
-# )
+print(
+      cosine_similarity(
+            Tensor([1.0, 2.0]),
+            Tensor([2.0, 3.0]),
+            dim=0
+      )
+)
 
-# print(
-#       pairwise_distance(
-#             Tensor([1.0, 2.0]),
-#             Tensor([2.0, 3.0]),
-#             p=2
-#       )     
-# )
+print(
+      pairwise_distance(
+            Tensor([1.0, 2.0]),
+            Tensor([2.0, 3.0]),
+            p=2
+      )     
+)
