@@ -1,50 +1,69 @@
 import json
+import regex as re
+import nltk
+nltk.download('punkt_tab')
 
 from prompt_converter import PromptConverter
 from utils import csv_writer, similarityFunctions
 from file_manager import FileManager
 from math import fabs
 from torch import Tensor
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
 
-def list_to_set(list1:list[list[str]]) -> set:
+def string_to_set(description:str) -> set:
       """
       converti une liste de listes en un set
       """
-      return set(item[0] for item in list1)
+      
+      cleaned = re.sub(r"[^\p{L}\s]", " ", description)     
+      tokenized = word_tokenize(cleaned)
+      ps = PorterStemmer()
+      stemmed = [ps.stem(word) for word in tokenized]
+      return set(stemmed)
+
 
 def jaccard_index(set1:set, set2:set) -> float:
       """
       Jaccard index entre 2 sets : |A n B| / |A u B|
+      on utilise la formule : 1 - |A n B| / |A u B|
+      pour obtenir la distance de jaccard
       """
       intersection = len(set1.intersection(set2))
       union = len(set1.union(set2))
       if union != 0:
-            return intersection / union
+            return 1 - intersection / union
       else:
-            return 0.0
+            return 1.0
       
-def compute_jaccard_index_over_dataset(dataset1:list[list[str]], dataset2:list[list[str]]) -> csv_writer:
+
+def compute_jaccard_index_over_dataset(dataset1:list[list[str]], dataset2:list[list[str]], location:str) -> csv_writer:
       """
       applique l'index de jaccard directement sur les datasets
       """
       csvManager = FileManager()
-      size1 = len(dataset1)
+      size1 = len(dataset1[0])
       # Initialize the similarity dictionary
-      similarityDict = [{v[0]: [0 for _ in range(size1)]} if i != 0 else {"description": [j[0] for j in dataset1]} for i, v in enumerate([" "] + dataset2)]
-      for i, v in enumerate([0] + dataset2):
+
+      flattened_list = [
+            sub if not isinstance(sub, list) or not all(isinstance(x, list) for x in sub) else x
+            for v in ([[""]] + dataset2)
+            for sub in (v if isinstance(v, list) else [v])
+      ]
+      similarityDict = [{v[0]: [0.0 for _ in range(size1)]} if i != 0 else {"description": [j[0] for j in dataset1[0]]} for i, v in enumerate(flattened_list)]
+      for i, v in enumerate(flattened_list):
             print("step :", i, "out of :", len(dataset2), "steps")
-            for j, w in enumerate(dataset1):
+            for j, w in enumerate(dataset1[0]):
                   # i == 0 is the description in w, w = {"description" : ["desc_1", "desc_2", ...]}
-                  if i != 0:
-                        similarityDict[i][v[0]][j] = jaccard_index(list_to_set(v), list_to_set(w))
+                  if i != 0 and i < j + 1:
+                        similarityDict[i][v[0]][j] = jaccard_index(string_to_set(v[0]), string_to_set(w[0]))
                         
-      print(similarityDict)
-      csvManager.write_similarity_dict_to_csv(similarityDict, "jaccard_without_embeddings.csv")
+      csvManager.write_similarity_dict_to_csv(similarityDict, location+"/jaccard_index.csv")
       return similarityDict
 
 def get_dataset_description(datasetName:str, descriptionType:str) -> list[list[str]]:
       """
-      from data get : [["desc_1"], ["desc_2"], ...]
+      from data get : [["desc_1"], ["desc_2"], ...] 
       where desc_X is the description of the dataset
       """
       with open(datasetName, "r", encoding="utf-8") as file:
@@ -68,7 +87,13 @@ def get_prompt_description(promptName:str) -> list[list[str]] :
       if type(data) is not str:
             for v in data:
                   new_data.append([" ".join(v)])
-      return new_data
+      return remove_duplicates(new_data)
+
+def remove_duplicates(nested_list: list[list[str]]) -> list[list[str]]:
+      """ Retire les doublons dans une liste de listes """
+      unique_items = set(tuple(sublist) for sublist in nested_list)
+      return [list(item) for item in unique_items]
+
 
 def compute_similarity_over_dataset(
             dataset1:list[list[str]], 
@@ -92,12 +117,18 @@ def compute_similarity_over_dataset(
       ### TODO : seperate header from data 
       csvManager = FileManager()
 
-      size1 = len(dataset1)
+      size1 = len(dataset1[0])
       # Initialize the similarity dictionary
-      similarityDict = [{v[0]: [0.0 for _ in range(size1)]} if i != 0 else {"description": [j[0] for j in dataset1]} for i, v in enumerate([""] + dataset2)]
-      for i, v in enumerate([[""]] + dataset2):
+
+      flattened_list = [
+            sub if not isinstance(sub, list) or not all(isinstance(x, list) for x in sub) else x
+            for v in ([[""]] + dataset2)
+            for sub in (v if isinstance(v, list) else [v])
+      ]
+      similarityDict = [{v[0]: [0.0 for _ in range(size1)]} if i != 0 else {"description": [j[0] for j in dataset1[0]]} for i, v in enumerate(flattened_list)]
+      for i, v in enumerate(flattened_list):
             print("step :", i, "out of :", len(dataset2), "steps")
-            for j, w in enumerate(dataset1):
+            for j, w in enumerate(dataset1[0]):
                   # i == 0 is the description in w, w = {"description" : ["desc_1", "desc_2", ...]}
                   if i != 0:
                         if d1Embedding is None and d2Embedding is None:
@@ -138,11 +169,12 @@ def compute_all_distances(
             outputLocation:str
       ) -> None:
 
-      #jaccard index avec des chaines de caractères sur les datasets directement
-      # compute_jaccard_index_over_dataset(
-      #       dataset1=dataset1,
-      #       dataset2=dataset2
-      # )
+      # jaccard index avec des chaines de caractères sur les datasets directement
+      compute_jaccard_index_over_dataset(
+            dataset1=dataset1,
+            dataset2=dataset2,
+            location=outputLocation
+      )
       
       """loops through the list of similarity functions and computes the similarity between the datasets"""
       for j, similarityFunction in enumerate(similarityFunctions):
@@ -167,12 +199,16 @@ def get_task_description(fileName:str, descriptionType:str) -> list:
             return [json.loads(line)[descriptionType] for line in file]
 
 
-
-# compute_all_distances(
-#       [get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories")],
-#       [get_prompt_description("data/sim_dataset-prompt/prompts.json")],
-#       similarityFunctions
-# )
+# Calcul des similarités entre les datasets et les prompts
+# à décommenter/commenter selon les résultats souhaités (prompt_to_prompt, prompt_to_datasetcard, task_category_to_prompt)
+compute_all_distances(
+      [get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "datasetcard")],
+      # [get_prompt_description("data/sim_dataset-prompt/prompts.json")],
+      # [get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories")],
+      [get_prompt_description("data/sim_dataset-prompt/prompts.json")],
+      similarityFunctions,
+      "sim_dataset-prompt"
+)
 
 datasets1 = get_dataset_description("data/sim_dataset-prompt/datasetdetails_cleaned.jsonl", "task_categories") # + \ get_dataset_description of another one
 datasets2 = get_prompt_description("data/sim_dataset-prompt/prompts.json")
@@ -191,6 +227,7 @@ file_names = [
       "dataset21-top_k4-top_p0.85-temp0.7.jsonl"
 ]
 
+# Calcul des similarités entre les datasets et les tasks
 for i, n in enumerate([1, 2, 3, 4, 5, 6, 7, 9, 10, 20, 21]):
 
       d1 = get_task_description(f"data/sim_tasks/{n}/{file_names[i]}", "task")
@@ -205,4 +242,9 @@ for i, n in enumerate([1, 2, 3, 4, 5, 6, 7, 9, 10, 20, 21]):
             similarityFunction=similarityFunctions[3],
             location=f"data/sim_tasks/{n}/",
             d1Embedding=[Tensor(e) for e in e1],
+      )
+      compute_jaccard_index_over_dataset(
+            dataset1=[[d] for d in d2],
+            dataset2=[[d1[0]]],
+            location=f"sim_tasks/{n}"
       )
